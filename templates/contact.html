@@ -1,0 +1,61 @@
+{% extends 'base.html' %}
+
+{% block title %}Contact Us{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="text-center mb-5">
+        <h1 class="display-4">Contact Us</h1>
+        <p class="lead">Get in touch with us for any queries</p>
+    </div>
+    
+    <div class="row">
+        <div class="col-md-6">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h4>Send us a message</h4>
+                    <form method="post">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            <label class="form-label">Name</label>
+                            <input type="text" name="name" class="form-control" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Email</label>
+                            <input type="email" name="email" class="form-control" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Message</label>
+                            <textarea name="message" rows="5" class="form-control" required></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Send Message</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-6">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h4>Contact Information</h4>
+                    <p><i class="fas fa-map-marker-alt"></i> <strong>Address:</strong><br>
+                    123 Education Street, Tech Park,<br>
+                    Bangalore - 560001, India</p>
+                    
+                    <p><i class="fas fa-phone"></i> <strong>Phone:</strong><br>
+                    +91 80 1234 5678<br>
+                    +91 98765 43210</p>
+                    
+                    <p><i class="fas fa-envelope"></i> <strong>Email:</strong><br>
+                    info@coursehub.com<br>
+                    support@coursehub.com</p>
+                    
+                    <p><i class="fas fa-clock"></i> <strong>Office Hours:</strong><br>
+                    Monday - Friday: 9:00 AM - 6:00 PM<br>
+                    Saturday: 9:00 AM - 2:00 PM</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

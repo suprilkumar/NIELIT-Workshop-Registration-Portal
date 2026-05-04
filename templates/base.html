@@ -1,0 +1,651 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}NIELIT - Course Registration Platform{% endblock %}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://cdn.datatables.net/1.11.5/css/dataTables.bootstrap5.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #1e3a8a;
+            --primary-dark: #0f2b6d;
+            --primary-light: #3b82f6;
+            --secondary-color: #64748b;
+            --success-color: #10b981;
+            --danger-color: #ef4444;
+            --warning-color: #f59e0b;
+            --info-color: #06b6d4;
+        }
+        
+        * {
+            font-family: 'Poppins', sans-serif;
+        }
+        
+        body {
+            padding-top: 0;
+            background-color: #f8fafc;
+        }
+        
+        /* Top Header Section - WHITE BACKGROUND */
+        .top-header {
+            background: white;
+            color: #1f2937;
+            padding: 12px 0;
+            transition: all 0.3s ease;
+            border-bottom: 1px solid #e5e7eb;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+        
+        .top-header.scrolled {
+            padding: 5px 0;
+        }
+        
+        .top-header .logo-img {
+            transition: all 0.3s ease;
+            width: 80px;
+            height: auto;
+        }
+        
+        .top-header.scrolled .logo-img {
+            width: 50px;
+        }
+        
+        .top-header .gov-text {
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+            color: #4b5563;
+        }
+        
+        .top-header.scrolled .gov-text {
+            font-size: 0.7rem;
+        }
+        
+        .top-header .main-title {
+            transition: all 0.3s ease;
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 0;
+            color: #1e3a8a;
+        }
+        
+        .top-header.scrolled .main-title {
+            font-size: 0.8rem;
+        }
+        
+        .top-header .sub-title {
+            transition: all 0.3s ease;
+            font-size: 0.8rem;
+            opacity: 0.8;
+            color: #4b5563;
+        }
+        
+        .top-header.scrolled .sub-title {
+            font-size: 0.6rem;
+        }
+        
+        /* Main Navigation - DARK BLUE BACKGROUND */
+        .main-nav {
+            background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 100%);
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+        
+        .main-nav.scrolled {
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .navbar-brand {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: white !important;
+            transition: all 0.3s ease;
+        }
+        
+        .navbar-brand i {
+            color: white;
+        }
+        
+        .main-nav.scrolled .navbar-brand {
+            font-size: 1.2rem;
+        }
+        
+        .nav-link {
+            font-weight: 500;
+            color: white !important;
+            transition: all 0.3s ease;
+            position: relative;
+            margin: 0 5px;
+            opacity: 0.95;
+        }
+        
+        .nav-link:hover {
+            color: white !important;
+            opacity: 1;
+            transform: translateY(-1px);
+        }
+        
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            bottom: 0;
+            left: 50%;
+            background-color: white;
+            transition: all 0.3s ease;
+            transform: translateX(-50%);
+        }
+        
+        .nav-link:hover::after,
+        .nav-link.active::after {
+            width: 80%;
+        }
+        
+        .nav-link.active {
+            color: white !important;
+            font-weight: 600;
+            opacity: 1;
+        }
+        
+        .btn-nav {
+            border-radius: 8px;
+            padding: 8px 20px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-nav-primary {
+            background: white;
+            color: var(--primary-color);
+            border: none;
+        }
+        
+        .btn-nav-primary:hover {
+            background: #f3f4f6;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            color: var(--primary-dark);
+        }
+        
+        .btn-nav-outline {
+            border: 2px solid white;
+            color: white;
+            background: transparent;
+        }
+        
+        .btn-nav-outline:hover {
+            background: white;
+            color: var(--primary-color);
+            transform: translateY(-2px);
+        }
+        
+        .user-dropdown .dropdown-toggle::after {
+            display: none;
+        }
+        
+        .user-dropdown .btn {
+            color: white !important;
+        }
+        
+        .user-dropdown .btn:hover {
+            background: rgba(255,255,255,0.1);
+        }
+        
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--primary-color);
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        
+        .main-nav.scrolled .user-avatar {
+            width: 35px;
+            height: 35px;
+            font-size: 0.9rem;
+        }
+        
+        /* Mobile Menu - Updated for dark theme */
+        .mobile-menu {
+            position: fixed;
+            top: 0;
+            right: -100%;
+            width: 80%;
+            max-width: 400px;
+            height: 100vh;
+            background: white;
+            z-index: 1050;
+            transition: right 0.3s ease;
+            box-shadow: -2px 0 8px rgba(0,0,0,0.1);
+            overflow-y: auto;
+        }
+        
+        .mobile-menu.active {
+            right: 0;
+        }
+        
+        .mobile-menu-header {
+            background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 100%);
+            color: white;
+            padding: 20px;
+        }
+        
+        .mobile-menu .nav-link {
+            padding: 12px 20px;
+            display: block;
+            border-bottom: 1px solid #e5e7eb;
+            color: #374151 !important;
+        }
+        
+        .mobile-menu .nav-link:hover {
+            background: #f3f4f6;
+            color: var(--primary-color) !important;
+        }
+        
+        .mobile-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 1040;
+            display: none;
+        }
+        
+        .mobile-overlay.active {
+            display: block;
+        }
+        
+        /* Dropdown Menu */
+        .dropdown-menu {
+            border: none;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            border-radius: 8px;
+            margin-top: 10px;
+        }
+        
+        .dropdown-item {
+            padding: 8px 20px;
+            transition: all 0.2s ease;
+        }
+        
+        .dropdown-item:hover {
+            background: #f3f4f6;
+            padding-left: 25px;
+        }
+        
+        /* Hero Section */
+        .hero-section {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 80px 0;
+            margin-bottom: 40px;
+        }
+        
+        /* Footer */
+        footer {
+            background: #1f2937;
+            color: #9ca3af;
+            margin-top: auto;
+        }
+        
+        .footer-links a {
+            color: #9ca3af;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+        
+        .footer-links a:hover {
+            color: white;
+        }
+        
+        /* Animations */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .animate-fade-in {
+            animation: fadeIn 0.3s ease;
+        }
+        
+        /* Mobile menu button */
+        #mobileMenuBtn {
+            color: white !important;
+        }
+        
+        #mobileMenuBtn i {
+            color: white;
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .top-header .main-title {
+                font-size: 0.7rem;
+            }
+            .top-header .sub-title {
+                font-size: 0.5rem;
+            }
+            .hero-section {
+                padding: 40px 0;
+            }
+        }
+    </style>
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    <!-- Top Header with Government Logos - WHITE BACKGROUND -->
+    <div class="top-header" id="topHeader">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-md-4 col-12 text-center text-md-start mb-2 mb-md-0">
+                    <div class="d-flex align-items-center justify-content-center justify-content-md-start gap-3">
+                        <img src="{% static 'assets/nielit_logo.jpg' %}" alt="NIELIT Logo" class="logo-img" id="logoImg">
+                        <div>
+                            <h1 class="main-title mb-0">National Institute of Electronics & Information Technology</h1>
+                            <p class="sub-title mb-0">राष्ट्रीय इलेक्ट्रॉनिकी एवं सूचना प्रौद्योगिकी संस्थान</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 col-12 text-center mb-2 mb-md-0">
+                    <div class="d-flex align-items-center justify-content-center justify-content-center gap-3">
+                        <img src="{% static 'assets/digital_india.svg.png' %}" alt="Digital India Logo" class="logo-img" id="logoImg">
+                    </div>
+                </div>
+               
+
+                <div class="col-md-4 col-12 text-center text-md-end">
+                    <div class="d-flex align-items-center justify-content-center justify-content-md-end gap-3">
+                        <div>
+                            <p class="mb-0 fw-bold">Ministry of Electronics & Information Technology</p>
+                            <p class="mb-0 small">Government of India</p>
+                        </div>
+                        <img src="{% static 'assets/nat_emblem.jpg' %}" alt="Government Emblem" class="logo-img" style="width: 50px;">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Navigation - DARK BLUE BACKGROUND -->
+    <nav class="main-nav" id="mainNav">
+        <div class="container">
+            <div class="d-flex justify-content-between align-items-center py-2">
+                <!-- Logo -->
+                <a class="navbar-brand text-decoration-none" href="{% url 'home' %}">
+                    <i class="fas fa-graduation-cap"></i>
+                    <span class="ms-2">NIELIT Delhi </span>
+                </a>
+
+                <!-- Desktop Menu -->
+                <div class="d-none d-lg-flex align-items-center gap-3">
+                    <a href="{% url 'home' %}" class="nav-link {% if request.resolver_match.url_name == 'home' %}active{% endif %}">
+                        <i class="fas fa-home me-1"></i> Home
+                    </a>
+                    <a href="{% url 'public_courses' %}" class="nav-link">
+                        <i class="fas fa-book me-1"></i> Courses
+                    </a>
+                    <a href="{% url 'public_centres' %}" class="nav-link">
+                        <i class="fas fa-building me-1"></i> Centers
+                    </a>
+                    <a href="{% url 'about' %}" class="nav-link">
+                        <i class="fas fa-info-circle me-1"></i> About
+                    </a>
+                    <a href="{% url 'contact' %}" class="nav-link">
+                        <i class="fas fa-envelope me-1"></i> Contact
+                    </a>
+                    <a href="{% url 'registration:certificate' %}" class="nav-link">
+                        <i class="fas fa-certificate me-1"></i> Certificate
+                    </a>
+                    
+                    {% if user.is_authenticated and user.is_staff %}
+                        <div class="dropdown user-dropdown">
+                            <button class="btn dropdown-toggle d-flex align-items-center gap-2" type="button" data-bs-toggle="dropdown">
+                                <div class="user-avatar">
+                                    {{ user.username|make_list|first|upper }}
+                                </div>
+                                <div class="text-start d-none d-xl-block">
+                                    <small class="d-block text-white-50">Welcome,</small>
+                                    <strong class="text-white">{{ user.username }}</strong>
+                                </div>
+                            </button>
+                            <ul class="dropdown-menu dropdown-menu-end">
+                                <li><a class="dropdown-item" href="{% url 'dashboard:index' %}">
+                                    <i class="fas fa-tachometer-alt me-2"></i> Dashboard
+                                </a></li>
+                                <li><a class="dropdown-item" href="#">
+                                    <i class="fas fa-user me-2"></i> Profile
+                                </a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item" href="{% url 'account:logout' %}">
+                                    <i class="fas fa-sign-out-alt me-2"></i> Logout
+                                </a></li>
+                            </ul>
+                        </div>
+                    {% else %}
+                        <a href="{% url 'account:login' %}" class="btn btn-nav-outline btn-nav">
+                            <i class="fas fa-lock me-1"></i> Admin Login
+                        </a>
+                    {% endif %}
+                </div>
+
+                <!-- Mobile Menu Button -->
+                <button class="btn d-lg-none" type="button" id="mobileMenuBtn">
+                    <i class="fas fa-bars fa-2x"></i>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Mobile Menu -->
+    <div class="mobile-overlay" id="mobileOverlay"></div>
+    <div class="mobile-menu" id="mobileMenu">
+        <div class="mobile-menu-header">
+            <div class="d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">Menu</h5>
+                <button class="btn btn-sm btn-light" id="closeMobileMenu">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            {% if user.is_authenticated and user.is_staff %}
+            <div class="mt-3 d-flex align-items-center gap-3">
+                <div class="user-avatar bg-white text-primary">
+                    {{ user.username|make_list|first|upper }}
+                </div>
+                <div>
+                    <p class="mb-0 fw-bold text-white">{{ user.username }}</p>
+                    <small class="text-white-50">Administrator</small>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+        <div class="mobile-menu-body">
+            <a href="{% url 'home' %}" class="nav-link">
+                <i class="fas fa-home me-2"></i> Home
+            </a>
+            <a href="{% url 'public_courses' %}" class="nav-link">
+                <i class="fas fa-book me-2"></i> Courses
+            </a>
+            <a href="{% url 'public_centres' %}" class="nav-link">
+                <i class="fas fa-building me-2"></i> Centers
+            </a>
+            <a href="{% url 'about' %}" class="nav-link">
+                <i class="fas fa-info-circle me-2"></i> About
+            </a>
+            <a href="{% url 'contact' %}" class="nav-link">
+                <i class="fas fa-envelope me-2"></i> Contact
+            </a>
+            <a href="{% url 'registration:certificate' %}" class="nav-link">
+                <i class="fas fa-certificate me-2"></i> Certificate
+            </a>
+            
+            {% if user.is_authenticated and user.is_staff %}
+                <a href="{% url 'dashboard:index' %}" class="nav-link">
+                    <i class="fas fa-tachometer-alt me-2"></i> Dashboard
+                </a>
+                <a href="{% url 'account:logout' %}" class="nav-link text-danger">
+                    <i class="fas fa-sign-out-alt me-2"></i> Logout
+                </a>
+            {% else %}
+                <div class="border-top pt-3 mt-3">
+                    <a href="{% url 'account:login' %}" class="btn btn-nav-primary w-100">
+                        <i class="fas fa-lock me-1"></i> Admin Login
+                    </a>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Content Block -->
+    <div class="content">
+        {% if messages %}
+            <div class="container mt-3">
+                {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }} alert-dismissible fade show shadow-sm" role="alert">
+                        <i class="fas fa-{% if message.tags == 'success' %}check-circle{% elif message.tags == 'error' %}exclamation-circle{% else %}info-circle{% endif %} me-2"></i>
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+
+        {% block content %}{% endblock %}
+    </div>
+
+    <!-- Footer -->
+    <footer class="mt-5">
+        <div class="container py-5">
+            <div class="row">
+                <div class="col-md-4 mb-4 mb-md-0">
+                    <h5 class="text-white mb-3">About Us</h5>
+                    <p>Empowering careers through quality education and professional training. An initiative by NIELIT, Ministry of Electronics & IT, Government of India.</p>
+                    <div class="social-links mt-3">
+                        <a href="#" class="text-white-50 me-3"><i class="fab fa-facebook-f fa-lg"></i></a>
+                        <a href="#" class="text-white-50 me-3"><i class="fab fa-twitter fa-lg"></i></a>
+                        <a href="#" class="text-white-50 me-3"><i class="fab fa-linkedin-in fa-lg"></i></a>
+                        <a href="#" class="text-white-50"><i class="fab fa-youtube fa-lg"></i></a>
+                    </div>
+                </div>
+                <div class="col-md-2 mb-4 mb-md-0">
+                    <h5 class="text-white mb-3">Quick Links</h5>
+                    <ul class="list-unstyled footer-links">
+                        <li><a href="{% url 'home' %}">Home</a></li>
+                        <li><a href="{% url 'public_courses' %}">Courses</a></li>
+                        <li><a href="{% url 'about' %}">About Us</a></li>
+                        <li><a href="{% url 'contact' %}">Contact</a></li>
+                    </ul>
+                </div>
+                <div class="col-md-3 mb-4 mb-md-0">
+                    <h5 class="text-white mb-3">Resources</h5>
+                    <ul class="list-unstyled footer-links">
+                        <li><a href="#">Student Portal</a></li>
+                        <li><a href="{% url 'registration:certificate' %}">Download Certificate</a></li>
+                        <li><a href="#">FAQs</a></li>
+                        <li><a href="#">Terms & Conditions</a></li>
+                    </ul>
+                </div>
+                <div class="col-md-3">
+                    <h5 class="text-white mb-3">Contact Info</h5>
+                    <ul class="list-unstyled footer-links">
+                        <li><i class="fas fa-map-marker-alt me-2"></i> New Delhi, India</li>
+                        <li><i class="fas fa-phone me-2"></i> +91 11 12345678</li>
+                        <li><i class="fas fa-envelope me-2"></i> info@nielit.gov.in</li>
+                    </ul>
+                </div>
+            </div>
+            <hr class="my-4 bg-secondary">
+            <div class="row">
+                <div class="col-12 text-center">
+                    <p class="mb-0">&copy; 2026 - NIELIT Delhi. All rights reserved. | Designed for Excellence</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.11.5/js/dataTables.bootstrap5.min.js"></script>
+    
+    <script>
+        // Navbar scroll effect
+        window.addEventListener('scroll', function() {
+            const topHeader = document.getElementById('topHeader');
+            const mainNav = document.getElementById('mainNav');
+            
+            if (window.scrollY > 50) {
+                topHeader.classList.add('scrolled');
+                mainNav.classList.add('scrolled');
+            } else {
+                topHeader.classList.remove('scrolled');
+                mainNav.classList.remove('scrolled');
+            }
+        });
+        
+        // Mobile menu toggle
+        const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+        const mobileMenu = document.getElementById('mobileMenu');
+        const mobileOverlay = document.getElementById('mobileOverlay');
+        const closeMobileMenu = document.getElementById('closeMobileMenu');
+        
+        function openMobileMenu() {
+            mobileMenu.classList.add('active');
+            mobileOverlay.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+        
+        function closeMobileMenuFunc() {
+            mobileMenu.classList.remove('active');
+            mobileOverlay.classList.remove('active');
+            document.body.style.overflow = '';
+        }
+        
+        mobileMenuBtn.addEventListener('click', openMobileMenu);
+        closeMobileMenu.addEventListener('click', closeMobileMenuFunc);
+        mobileOverlay.addEventListener('click', closeMobileMenuFunc);
+        
+        // Close mobile menu on window resize
+        window.addEventListener('resize', function() {
+            if (window.innerWidth > 992) {
+                closeMobileMenuFunc();
+            }
+        });
+        
+        // Add active class to current nav link
+        const currentLocation = window.location.pathname;
+        const navLinks = document.querySelectorAll('.nav-link');
+        navLinks.forEach(link => {
+            if (link.getAttribute('href') === currentLocation) {
+                link.classList.add('active');
+            }
+        });
+        
+        // Tooltip initialization
+        var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+        var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+            return new bootstrap.Tooltip(tooltipTriggerEl)
+        });
+    </script>
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

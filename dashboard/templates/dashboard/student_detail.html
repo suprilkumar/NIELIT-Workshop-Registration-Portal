@@ -1,0 +1,68 @@
+{% extends 'dashboard/base_dashboard.html' %}
+
+{% block title %}Student Details{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <h3 class="mb-0">Student Registration Details</h3>
+                </div>
+                <div class="card-body">
+                    <div class="row mb-3">
+                        <div class="col-md-4 fw-bold">Name:</div>
+                        <div class="col-md-8">{{ student.name }}</div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-md-4 fw-bold">Mobile Number:</div>
+                        <div class="col-md-8">{{ student.mobile_number }}</div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-md-4 fw-bold">Email ID:</div>
+                        <div class="col-md-8">{{ student.email_id }}</div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-md-4 fw-bold">Date of Birth:</div>
+                        <div class="col-md-8">{{ student.date_of_birth }}</div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-md-4 fw-bold">Category:</div>
+                        <div class="col-md-8">{{ student.get_category_display }}</div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-md-4 fw-bold">Father's Name:</div>
+                        <div class="col-md-8">{{ student.father_name }}</div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-md-4 fw-bold">Course Enrolled:</div>
+                        <div class="col-md-8">{{ student.course_enrolled.course_name }}</div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-md-4 fw-bold">Preferred Center:</div>
+                        <div class="col-md-8">{{ student.preferred_centre.centre_name }}</div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-md-4 fw-bold">Certificate Status:</div>
+                        <div class="col-md-8">
+                            {% if student.is_approved %}
+                                <span class="badge bg-success">Approved</span>
+                            {% else %}
+                                <span class="badge bg-warning">Pending Approval</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-md-4 fw-bold">Registration Date:</div>
+                        <div class="col-md-8">{{ student.registration_date|date:"F d, Y H:i" }}</div>
+                    </div>
+                    <div class="d-grid gap-2">
+                        <a href="{% url 'dashboard:students_list' %}" class="btn btn-secondary">Back to List</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
