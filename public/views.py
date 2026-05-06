@@ -5,6 +5,11 @@ from course.models import Course, Centre
 from registration.models import Student
 from django.utils import timezone
 
+from django.http import HttpResponse, Http404
+from django.conf import settings
+from django.views.static import serve
+import os
+
 def home(request):
     """Public home page with hero section and featured content"""
     featured_courses = Course.objects.filter(is_active=True, is_featured=True)[:6]
@@ -112,3 +117,15 @@ def about(request):
 def contact(request):
     """Contact page"""
     return render(request, 'public/contact.html')
+
+
+def serve_media(request, path):
+    """Serve media files in production"""
+    if settings.DEBUG:
+        return serve(request, path, document_root=settings.MEDIA_ROOT)
+    
+    file_path = os.path.join(settings.MEDIA_ROOT, path)
+    if os.path.exists(file_path):
+        with open(file_path, 'rb') as f:
+            return HttpResponse(f.read(), content_type='image/jpeg')
+    raise Http404("File not found")
