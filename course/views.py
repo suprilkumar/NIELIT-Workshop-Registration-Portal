@@ -1,20 +1,47 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from django.contrib.auth.decorators import user_passes_test
+from django.core.paginator import Paginator
+from django.db import models
+from django.http import JsonResponse
 from .models import Course, Centre
 from .forms import CourseForm, CentreForm
 
 def is_admin(user):
     return user.is_authenticated and user.is_staff
 
-def home(request):
-    courses = Course.objects.filter(course_status__in=['active', 'open', 'ongoing'])
-    centres = Centre.objects.all()
-    return render(request, 'course/course_list.html', {
-        'courses': courses,
-        'centres': centres
+# API Views
+def get_all_centres(request):
+    """API endpoint to get all centres for the select all feature"""
+    centres = Centre.objects.all().values('id', 'centre_name', 'centre_address')
+    return JsonResponse({
+        'centres': list(centres)
     })
 
+def get_course_centres(request):
+    """API endpoint to get centres for a course"""
+    course_id = request.GET.get('course_id')
+    if course_id:
+        try:
+            course = Course.objects.get(id=course_id)
+            if course.mode == 'online':
+                centres = Centre.objects.all().values('id', 'centre_name', 'centre_address')
+                return JsonResponse({
+                    'mode': 'online',
+                    'centres': list(centres)
+                })
+            else:
+                centres = course.available_centres.all().values('id', 'centre_name', 'centre_address')
+                return JsonResponse({
+                    'mode': 'offline',
+                    'centres': list(centres)
+                })
+        except Course.DoesNotExist:
+            return JsonResponse({'mode': 'unknown', 'centres': []})
+    return JsonResponse({'mode': 'unknown', 'centres': []})
+
+
+# Admin Views - Course Management
 @user_passes_test(is_admin)
 def course_list(request):
     courses = Course.objects.all()
@@ -23,7 +50,7 @@ def course_list(request):
 @user_passes_test(is_admin)
 def course_create(request):
     if request.method == 'POST':
-        form = CourseForm(request.POST)
+        form = CourseForm(request.POST, request.FILES)
         if form.is_valid():
             form.save()
             messages.success(request, 'Course created successfully!')
@@ -36,7 +63,7 @@ def course_create(request):
 def course_edit(request, pk):
     course = get_object_or_404(Course, pk=pk)
     if request.method == 'POST':
-        form = CourseForm(request.POST, instance=course)
+        form = CourseForm(request.POST, request.FILES, instance=course)
         if form.is_valid():
             form.save()
             messages.success(request, 'Course updated successfully!')
@@ -54,6 +81,7 @@ def course_delete(request, pk):
         return redirect('course:course_list')
     return render(request, 'course/course_confirm_delete.html', {'object': course})
 
+# Admin Views - Centre Management
 @user_passes_test(is_admin)
 def centre_list(request):
     centres = Centre.objects.all()
@@ -92,26 +120,3 @@ def centre_delete(request, pk):
         messages.success(request, 'Centre deleted successfully!')
         return redirect('course:centre_list')
     return render(request, 'course/centre_confirm_delete.html', {'object': centre})
-
-
-def public_courses(request):
-    courses = Course.objects.filter(course_status__in=['active', 'open', 'ongoing'])
-    return render(request, 'courses_public.html', {'courses': courses})
-
-def public_centres(request):
-    centres = Centre.objects.all()
-    return render(request, 'centres_public.html', {'centres': centres})
-
-def about(request):
-    return render(request, 'about.html')
-
-def contact(request):
-    if request.method == 'POST':
-        # Handle contact form submission
-        name = request.POST.get('name')
-        email = request.POST.get('email')
-        message = request.POST.get('message')
-        # Add email sending logic here
-        messages.success(request, 'Thank you for contacting us! We will get back to you soon.')
-        return redirect('contact')
-    return render(request, 'contact.html')

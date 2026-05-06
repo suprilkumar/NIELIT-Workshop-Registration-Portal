@@ -12,9 +12,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = "django-insecure-tq=hv)6@!p^qux7a=$e6m^kixq9%ve8+bt^@8(0@4u8$9o1^b)"
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -31,6 +31,7 @@ INSTALLED_APPS = [
     'course',
     'registration',
     'dashboard',
+    "public",
 ]
 
 MIDDLEWARE = [

@@ -1,0 +1,130 @@
+{% extends 'public/base.html' %}
+
+{% block title %}My Profile - NIELIT{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <div class="text-center mb-5">
+                <h1 class="display-5 fw-bold text-primary">
+                    <i class="fas fa-id-card me-3"></i>My Profile
+                </h1>
+                <p class="lead text-secondary">View your registered courses and download certificates</p>
+                <div class="alert alert-info d-inline-block">
+                    <i class="fas fa-info-circle me-2"></i>Enter your Email or Mobile Number to view your registrations
+                </div>
+            </div>
+
+            <div class="card shadow-sm mb-5">
+                <div class="card-body p-4">
+                    <form method="post">
+                        {% csrf_token %}
+                        <div class="row g-3">
+                            <div class="col-12">
+                                <div class="d-flex gap-4 mb-3 justify-content-center">
+                                    {% for radio in form.lookup_by %}
+                                        <div class="form-check">
+                                            {{ radio.tag }}
+                                            <label class="form-check-label" for="{{ radio.id_for_label }}">
+                                                {{ radio.choice_label }}
+                                            </label>
+                                        </div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                            <div class="col-md-8">
+                                <div id="email_field">
+                                    <label class="form-label fw-semibold">Email Address</label>
+                                    {{ form.email_id }}
+                                </div>
+                                <div id="mobile_field" style="display: none;">
+                                    <label class="form-label fw-semibold">Mobile Number</label>
+                                    {{ form.mobile_number }}
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <button type="submit" class="btn btn-primary w-100 py-2 mt-4">
+                                    <i class="fas fa-search me-2"></i>View My Courses
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            {% if lookup_done %}
+                {% if students %}
+                    <div class="mt-4">
+                        <h3 class="mb-4">Your Registrations ({{ students|length }})</h3>
+                        <div class="row g-4">
+                            {% for student in students %}
+                            <div class="col-md-6 col-lg-4">
+                                <div class="card h-100 shadow-sm">
+                                    <div class="card-header bg-{% if student.status == 'confirmed' %}success{% elif student.status == 'pending' %}warning{% elif student.status == 'completed' %}info{% else %}secondary{% endif %} text-white">
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <small>{{ student.registration_number }}</small>
+                                            <span class="badge bg-light text-dark">{{ student.get_status_display }}</span>
+                                        </div>
+                                    </div>
+                                    <div class="card-body">
+                                        <h5 class="card-title text-primary">{{ student.course_enrolled.course_name }}</h5>
+                                        <p class="small text-muted">{{ student.course_enrolled.course_duration }}</p>
+                                        <p><i class="fas fa-building me-2"></i>{{ student.preferred_centre.centre_name }}</p>
+                                        <p><i class="fas fa-calendar me-2"></i>Registered: {{ student.registration_date|date:"d M Y" }}</p>
+                                    </div>
+                                    <div class="card-footer bg-white">
+                                        {% if student.status == 'completed' %}
+                                            <a href="{% url 'registration:download_certificate' student.registration_number %}" class="btn btn-success w-100">
+                                                <i class="fas fa-download me-2"></i>Download Certificate
+                                            </a>
+                                        {% elif student.status == 'confirmed' %}
+                                            <button class="btn btn-secondary w-100" disabled>Course in Progress</button>
+                                        {% else %}
+                                            <button class="btn btn-warning w-100" disabled>Pending Confirmation</button>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                {% else %}
+                    <div class="alert alert-warning text-center p-5">
+                        <i class="fas fa-folder-open fa-3x mb-3 d-block"></i>
+                        <h4>No Registrations Found</h4>
+                        <p>You haven't registered for any courses yet.</p>
+                        <a href="{% url 'course:public_courses' %}" class="btn btn-primary mt-2">Browse Courses</a>
+                    </div>
+                {% endif %}
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<script>
+    const radioButtons = document.querySelectorAll('input[name="lookup_by"]');
+    const emailField = document.getElementById('email_field');
+    const mobileField = document.getElementById('mobile_field');
+    const emailInput = document.querySelector('#id_email_id');
+    const mobileInput = document.querySelector('#id_mobile_number');
+    
+    function toggleFields() {
+        const selected = document.querySelector('input[name="lookup_by"]:checked').value;
+        if (selected === 'email') {
+            emailField.style.display = 'block';
+            mobileField.style.display = 'none';
+            if (emailInput) emailInput.required = true;
+            if (mobileInput) mobileInput.required = false;
+        } else {
+            emailField.style.display = 'none';
+            mobileField.style.display = 'block';
+            if (emailInput) emailInput.required = false;
+            if (mobileInput) mobileInput.required = true;
+        }
+    }
+    
+    radioButtons.forEach(radio => radio.addEventListener('change', toggleFields));
+    toggleFields();
+</script>
+{% endblock %}

@@ -1,16 +1,13 @@
+# project_dj_course_platform/urls.py (root level)
 from django.contrib import admin
 from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
-from course.views import home, public_courses, public_centres, about, contact
+from django.shortcuts import redirect
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', home, name='home'),
-    path('courses/', public_courses, name='public_courses'),
-    path('centres/', public_centres, name='public_centres'),
-    path('about/', about, name='about'),
-    path('contact/', contact, name='contact'),
+    path('', include('public.urls')),  # Public app as main
     path('account/', include('account.urls')),
     path('course/', include('course.urls')),
     path('registration/', include('registration.urls')),

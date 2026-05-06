@@ -3,17 +3,13 @@ from django.contrib.auth.decorators import user_passes_test
 from django.contrib import messages
 from django.db.models import Count, Q
 from django.http import JsonResponse, HttpResponse
-from registration.models import Student
+from django.core.paginator import Paginator
+from registration.models import Student, Certificate
 from course.models import Course, Centre
 from datetime import datetime, timedelta
 import json
 import pandas as pd
 from io import BytesIO
-from reportlab.lib import colors
-from reportlab.lib.pagesizes import letter, landscape
-from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer
-from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
-from reportlab.lib.units import inch
 
 def is_admin(user):
     return user.is_authenticated and user.is_staff
@@ -24,7 +20,7 @@ def dashboard_index(request):
     total_courses = Course.objects.count()
     total_centres = Centre.objects.count()
     approved_students = Student.objects.filter(is_approved=True).count()
-    pending_approvals = Student.objects.filter(is_approved=False).count()
+    pending_approvals = Student.objects.filter(is_approved=False, status='confirmed').count()
     
     recent_registrations = Student.objects.all().select_related('course_enrolled', 'preferred_centre')[:10]
     
@@ -38,6 +34,7 @@ def dashboard_index(request):
         'total_centres': total_centres,
         'approved_students': approved_students,
         'pending_approvals': pending_approvals,
+        'pending_approvals_count': pending_approvals,
         'recent_registrations': recent_registrations,
         'course_enrollment_stats': course_enrollment_stats,
         'now': datetime.now(),
@@ -46,52 +43,41 @@ def dashboard_index(request):
 
 @user_passes_test(is_admin)
 def students_list(request):
-    # Get all students with related data
     students = Student.objects.select_related('course_enrolled', 'preferred_centre').all()
     
-    # Get filter parameters
     course_filter = request.GET.get('course')
     center_filter = request.GET.get('center')
     status_filter = request.GET.get('status')
-    category_filter = request.GET.get('category')
     search_query = request.GET.get('search')
     
-    # Apply filters
     if course_filter and course_filter != '':
         students = students.filter(course_enrolled_id=course_filter)
-    
     if center_filter and center_filter != '':
         students = students.filter(preferred_centre_id=center_filter)
-    
     if status_filter and status_filter != '':
-        if status_filter == 'approved':
-            students = students.filter(is_approved=True)
-        elif status_filter == 'pending':
-            students = students.filter(is_approved=False)
-    
-    if category_filter and category_filter != '':
-        students = students.filter(category=category_filter)
-    
+        students = students.filter(status=status_filter)
     if search_query:
         students = students.filter(
             Q(name__icontains=search_query) |
             Q(mobile_number__icontains=search_query) |
             Q(email_id__icontains=search_query) |
-            Q(father_name__icontains=search_query)
+            Q(registration_number__icontains=search_query)
         )
     
-    # Get all courses and centers for filter dropdowns
+    paginator = Paginator(students, 20)
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+    
     courses = Course.objects.all()
     centres = Centre.objects.all()
     
     context = {
-        'students': students,
+        'page_obj': page_obj,
         'courses': courses,
         'centres': centres,
         'selected_course': course_filter,
         'selected_center': center_filter,
         'selected_status': status_filter,
-        'selected_category': category_filter,
         'search_query': search_query,
     }
     return render(request, 'dashboard/students_list.html', context)
@@ -103,44 +89,97 @@ def student_detail(request, pk):
 
 @user_passes_test(is_admin)
 def approve_certificate(request):
-    students = Student.objects.filter(is_approved=False).select_related('course_enrolled', 'preferred_centre')
+    students = Student.objects.filter(
+        status='confirmed', 
+        is_approved=False
+    ).select_related('course_enrolled', 'preferred_centre')
     
-    if request.method == 'POST':
-        student_id = request.POST.get('student_id')
-        if student_id:
-            student = get_object_or_404(Student, id=student_id)
-            student.is_approved = True
-            student.save()
-            messages.success(request, f'Student {student.name} has been approved for certification!')
-            return redirect('dashboard:approve_certificate')
-    
-    return render(request, 'dashboard/approve_certificate.html', {'students': students})
+    context = {
+        'students': students,
+        'pending_approvals_count': students.count(),
+    }
+    return render(request, 'dashboard/approve_certificate.html', context)
 
 @user_passes_test(is_admin)
-def approve_multiple(request):
+def approve_bulk(request):
+    """Bulk approve students for certificate"""
     if request.method == 'POST':
         student_ids = request.POST.getlist('student_ids')
         if student_ids:
-            count = Student.objects.filter(id__in=student_ids).update(is_approved=True)
-            messages.success(request, f'{count} students have been approved for certification!')
-        return redirect('dashboard:approve_certificate')
+            count = 0
+            for student_id in student_ids:
+                try:
+                    student = Student.objects.get(id=student_id)
+                    if student.status == 'confirmed' and not student.is_approved:
+                        student.is_approved = True
+                        student.status = 'completed'
+                        student.save()
+                        Certificate.objects.get_or_create(student=student)
+                        count += 1
+                except Student.DoesNotExist:
+                    continue
+            messages.success(request, f'{count} student(s) have been approved for certification!')
+        else:
+            messages.warning(request, 'No students selected for approval.')
+        return redirect('dashboard:students_list')
+    return redirect('dashboard:students_list')
 
 @user_passes_test(is_admin)
-def approve_single(request):
+def update_status_bulk(request):
+    """Bulk update student status"""
+    if request.method == 'POST':
+        student_ids = request.POST.getlist('student_ids')
+        new_status = request.POST.get('status')
+        
+        if student_ids and new_status:
+            count = 0
+            for student_id in student_ids:
+                try:
+                    student = Student.objects.get(id=student_id)
+                    student.status = new_status
+                    student.save()
+                    count += 1
+                except Student.DoesNotExist:
+                    continue
+            messages.success(request, f'{count} student(s) status updated to {new_status}!')
+        else:
+            messages.warning(request, 'Please select students and a status.')
+        return redirect('dashboard:students_list')
+    return redirect('dashboard:students_list')
+
+@user_passes_test(is_admin)
+def delete_bulk(request):
+    """Bulk delete students"""
+    if request.method == 'POST':
+        student_ids = request.POST.getlist('student_ids')
+        if student_ids:
+            # Delete certificates first (due to foreign key)
+            Certificate.objects.filter(student_id__in=student_ids).delete()
+            # Delete students
+            count = Student.objects.filter(id__in=student_ids).delete()[0]
+            messages.success(request, f'{count} student(s) have been deleted successfully!')
+        else:
+            messages.warning(request, 'No students selected for deletion.')
+        return redirect('dashboard:students_list')
+    return redirect('dashboard:students_list')
+
+@user_passes_test(is_admin)
+def update_status(request):
+    """Single student status update via AJAX"""
     if request.method == 'POST':
         student_id = request.POST.get('student_id')
+        new_status = request.POST.get('status')
         try:
             student = Student.objects.get(id=student_id)
-            student.is_approved = True
+            student.status = new_status
             student.save()
-            return JsonResponse({'success': True, 'message': 'Student approved successfully!'})
+            return JsonResponse({'success': True, 'message': f'Status updated to {new_status}!'})
         except Student.DoesNotExist:
             return JsonResponse({'success': False, 'message': 'Student not found!'})
     return JsonResponse({'success': False, 'message': 'Invalid request!'})
 
 @user_passes_test(is_admin)
 def reports(request):
-    # Get last 30 days registration data
     end_date = datetime.now().date()
     start_date = end_date - timedelta(days=30)
     
@@ -153,7 +192,6 @@ def reports(request):
         counts.append(count)
         current_date += timedelta(days=1)
     
-    # Category distribution
     categories = Student.objects.values('category').annotate(count=Count('id'))
     category_labels = []
     category_data = []
@@ -162,7 +200,6 @@ def reports(request):
         category_labels.append(category_map.get(c['category'], c['category']))
         category_data.append(c['count'])
     
-    # Course enrollment distribution
     course_stats = Course.objects.annotate(student_count=Count('students')).filter(student_count__gt=0)
     course_labels = [course.course_name for course in course_stats]
     course_data = [course.student_count for course in course_stats]
@@ -176,24 +213,26 @@ def reports(request):
         'course_data': json.dumps(course_data),
         'total_students': Student.objects.count(),
         'approved_count': Student.objects.filter(is_approved=True).count(),
-        'pending_count': Student.objects.filter(is_approved=False).count(),
+        'pending_count': Student.objects.filter(is_approved=False, status='confirmed').count(),
     }
     return render(request, 'dashboard/reports.html', context)
 
 @user_passes_test(is_admin)
-def generate_full_report(request):
-    # Generate Excel report
+def export_students_excel(request):
+    """Export students data to Excel"""
     students = Student.objects.select_related('course_enrolled', 'preferred_centre').all().values(
-        'name', 'mobile_number', 'email_id', 'date_of_birth', 'category', 
-        'father_name', 'course_enrolled__course_name', 'preferred_centre__centre_name',
-        'is_approved', 'registration_date'
+        'registration_number', 'name', 'mobile_number', 'email_id', 'date_of_birth', 
+        'category', 'father_name', 'course_enrolled__course_name', 'preferred_centre__centre_name',
+        'is_approved', 'status', 'registration_date'
     )
     
     df = pd.DataFrame(list(students))
-    df.columns = ['Name', 'Mobile Number', 'Email', 'Date of Birth', 'Category', 
-                  'Father Name', 'Course Enrolled', 'Preferred Centre', 'Certificate Status', 'Registration Date']
+    df.columns = ['Registration Number', 'Name', 'Mobile Number', 'Email', 'Date of Birth', 
+                  'Category', 'Father Name', 'Course Enrolled', 'Preferred Centre', 
+                  'Certificate Status', 'Registration Status', 'Registration Date']
     
-    # Create Excel file
+    df['Certificate Status'] = df['Certificate Status'].apply(lambda x: 'Issued' if x else 'Pending')
+    
     output = BytesIO()
     with pd.ExcelWriter(output, engine='openpyxl') as writer:
         df.to_excel(writer, sheet_name='Students Report', index=False)
@@ -205,7 +244,13 @@ def generate_full_report(request):
 
 @user_passes_test(is_admin)
 def export_students_pdf(request):
-    students = Student.objects.select_related('course_enrolled', 'preferred_centre').all()
+    """Export students data to PDF"""
+    from reportlab.lib import colors
+    from reportlab.lib.pagesizes import letter, landscape
+    from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Spacer, Paragraph
+    from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+    
+    students = Student.objects.select_related('course_enrolled', 'preferred_centre').all()[:100]
     
     response = HttpResponse(content_type='application/pdf')
     response['Content-Disposition'] = f'attachment; filename=students_report_{datetime.now().strftime("%Y%m%d_%H%M%S")}.pdf'
@@ -213,38 +258,35 @@ def export_students_pdf(request):
     doc = SimpleDocTemplate(response, pagesize=landscape(letter))
     elements = []
     
-    # Styles
     styles = getSampleStyleSheet()
     title_style = ParagraphStyle('CustomTitle', parent=styles['Heading1'], fontSize=16, alignment=1, spaceAfter=30)
     
-    # Title
-    elements.append(Paragraph("Students Registration Report", title_style))
+    elements.append(Paragraph("NIELIT Students Registration Report", title_style))
     elements.append(Spacer(1, 20))
     
-    # Table data
-    data = [['Name', 'Mobile', 'Email', 'Course', 'Center', 'Status', 'Date']]
+    data = [['Reg Number', 'Name', 'Mobile', 'Email', 'Course', 'Center', 'Status']]
     for student in students:
         data.append([
+            student.registration_number,
             student.name,
             student.mobile_number,
-            student.email_id,
-            student.course_enrolled.course_name,
-            student.preferred_centre.centre_name,
-            'Approved' if student.is_approved else 'Pending',
-            student.registration_date.strftime('%Y-%m-%d')
+            student.email_id[:20],
+            student.course_enrolled.course_name[:25],
+            student.preferred_centre.centre_name[:20],
+            'Approved' if student.is_approved else 'Pending'
         ])
     
-    # Create table
     table = Table(data)
     table.setStyle(TableStyle([
         ('BACKGROUND', (0, 0), (-1, 0), colors.grey),
         ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
         ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
         ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
-        ('FONTSIZE', (0, 0), (-1, 0), 10),
+        ('FONTSIZE', (0, 0), (-1, 0), 8),
         ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
         ('BACKGROUND', (0, 1), (-1, -1), colors.beige),
         ('GRID', (0, 0), (-1, -1), 1, colors.black),
+        ('FONTSIZE', (0, 1), (-1, -1), 7),
     ]))
     
     elements.append(table)

@@ -28,6 +28,9 @@
         body {
             padding-top: 0;
             background-color: #f8fafc;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
         }
         
         /* Top Header Section - WHITE BACKGROUND */
@@ -46,30 +49,22 @@
         
         .top-header .logo-img {
             transition: all 0.3s ease;
-            width: 80px;
-            height: auto;
+            width: auto;
+            height: 60px;
+            object-fit: contain;
         }
         
         .top-header.scrolled .logo-img {
             width: 50px;
         }
         
-        .top-header .gov-text {
-            transition: all 0.3s ease;
-            font-size: 0.9rem;
-            color: #4b5563;
-        }
-        
-        .top-header.scrolled .gov-text {
-            font-size: 0.7rem;
-        }
-        
         .top-header .main-title {
             transition: all 0.3s ease;
-            font-size: 1.1rem;
-            font-weight: 600;
+            font-size: 0.95rem;
+            font-weight: 700;
             margin-bottom: 0;
             color: #1e3a8a;
+            line-height: 1.3;
         }
         
         .top-header.scrolled .main-title {
@@ -78,9 +73,10 @@
         
         .top-header .sub-title {
             transition: all 0.3s ease;
-            font-size: 0.8rem;
+            font-size: 0.7rem;
             opacity: 0.8;
             color: #4b5563;
+            margin-bottom: 0;
         }
         
         .top-header.scrolled .sub-title {
@@ -106,6 +102,7 @@
             font-weight: 700;
             color: white !important;
             transition: all 0.3s ease;
+            text-decoration: none;
         }
         
         .navbar-brand i {
@@ -123,6 +120,8 @@
             position: relative;
             margin: 0 5px;
             opacity: 0.95;
+            text-decoration: none;
+            padding: 8px 16px;
         }
         
         .nav-link:hover {
@@ -159,6 +158,8 @@
             padding: 8px 20px;
             font-weight: 500;
             transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
         }
         
         .btn-nav-primary {
@@ -217,7 +218,7 @@
             font-size: 0.9rem;
         }
         
-        /* Mobile Menu - Updated for dark theme */
+        /* Mobile Menu */
         .mobile-menu {
             position: fixed;
             top: 0;
@@ -247,6 +248,7 @@
             display: block;
             border-bottom: 1px solid #e5e7eb;
             color: #374151 !important;
+            text-decoration: none;
         }
         
         .mobile-menu .nav-link:hover {
@@ -280,19 +282,12 @@
         .dropdown-item {
             padding: 8px 20px;
             transition: all 0.2s ease;
+            text-decoration: none;
         }
         
         .dropdown-item:hover {
             background: #f3f4f6;
             padding-left: 25px;
-        }
-        
-        /* Hero Section */
-        .hero-section {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 80px 0;
-            margin-bottom: 40px;
         }
         
         /* Footer */
@@ -337,16 +332,38 @@
             color: white;
         }
         
+        /* Custom Card Hover Effect */
+        .card-hover {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        
+        .card-hover:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+        
         /* Responsive */
         @media (max-width: 768px) {
             .top-header .main-title {
                 font-size: 0.7rem;
             }
             .top-header .sub-title {
-                font-size: 0.5rem;
+                font-size: 0.55rem;
             }
-            .hero-section {
-                padding: 40px 0;
+            .top-header .logo-img {
+                width: 45px;
+            }
+        }
+        
+        @media (max-width: 576px) {
+            .top-header .main-title {
+                font-size: 0.6rem;
+            }
+            .top-header .sub-title {
+                font-size: 0.45rem;
+            }
+            .top-header .logo-img {
+                width: 35px;
             }
         }
     </style>
@@ -356,30 +373,30 @@
     <!-- Top Header with Government Logos - WHITE BACKGROUND -->
     <div class="top-header" id="topHeader">
         <div class="container">
-            <div class="row align-items-center">
-                <div class="col-md-4 col-12 text-center text-md-start mb-2 mb-md-0">
+            <div class="row align-items-center g-2">
+                <div class="col-md-4 col-12 text-center text-md-start">
                     <div class="d-flex align-items-center justify-content-center justify-content-md-start gap-3">
-                        <img src="{% static 'assets/nielit_logo.jpg' %}" alt="NIELIT Logo" class="logo-img" id="logoImg">
+                        <img src="{% static 'assets/nielit_logo.jpg' %}" alt="NIELIT Logo" class="logo-img" onerror="this.src='https://via.placeholder.com/70?text=NIELIT'">
                         <div>
-                            <h1 class="main-title mb-0">National Institute of Electronics & Information Technology</h1>
+                            <h1 class="main-title mb-0">National Institute of Electronics<br>& Information Technology</h1>
                             <p class="sub-title mb-0">राष्ट्रीय इलेक्ट्रॉनिकी एवं सूचना प्रौद्योगिकी संस्थान</p>
                         </div>
                     </div>
                 </div>
-                <div class="col-md-4 col-12 text-center mb-2 mb-md-0">
-                    <div class="d-flex align-items-center justify-content-center justify-content-center gap-3">
-                        <img src="{% static 'assets/digital_india.svg.png' %}" alt="Digital India Logo" class="logo-img" id="logoImg">
+                
+                <div class="col-md-4 col-12 text-center">
+                    <div class="d-flex align-items-center justify-content-center gap-3">
+                        <img src="{% static 'assets/digital_india.png' %}" alt="Digital India Logo" class="logo-img" style="height: 60px;" onerror="this.src='https://via.placeholder.com/60?text=Digital+India'">
                     </div>
                 </div>
-               
 
                 <div class="col-md-4 col-12 text-center text-md-end">
                     <div class="d-flex align-items-center justify-content-center justify-content-md-end gap-3">
                         <div>
-                            <p class="mb-0 fw-bold">Ministry of Electronics & Information Technology</p>
-                            <p class="mb-0 small">Government of India</p>
+                            <p class="mb-0 fw-bold small">Ministry of Electronics &<br>Information Technology</p>
+                            <p class="mb-0 small text-muted">Government of India</p>
                         </div>
-                        <img src="{% static 'assets/nat_emblem.jpg' %}" alt="Government Emblem" class="logo-img" style="width: 50px;">
+                        <img src="{% static 'assets/nat_emblem.jpg' %}" alt="Government Emblem" class="logo-img" style="width: 45px;" onerror="this.src='https://via.placeholder.com/45?text=Emblem'">
                     </div>
                 </div>
             </div>
@@ -391,30 +408,30 @@
         <div class="container">
             <div class="d-flex justify-content-between align-items-center py-2">
                 <!-- Logo -->
-                <a class="navbar-brand text-decoration-none" href="{% url 'home' %}">
-                    <i class="fas fa-graduation-cap"></i>
-                    <span class="ms-2">NIELIT Delhi </span>
+                <a class="navbar-brand d-flex align-items-center gap-2" href="{% url 'public:home' %}">
+                    <i class="fas fa-graduation-cap fa-2x"></i>
+                    <span class="ms-2 fw-bold">NIELIT Delhi</span>
                 </a>
 
                 <!-- Desktop Menu -->
-                <div class="d-none d-lg-flex align-items-center gap-3">
-                    <a href="{% url 'home' %}" class="nav-link {% if request.resolver_match.url_name == 'home' %}active{% endif %}">
+                <div class="d-none d-lg-flex align-items-center gap-2">
+                    <a href="{% url 'public:home' %}" class="nav-link">
                         <i class="fas fa-home me-1"></i> Home
                     </a>
-                    <a href="{% url 'public_courses' %}" class="nav-link">
+                    <a href="{% url 'public:courses' %}" class="nav-link">
                         <i class="fas fa-book me-1"></i> Courses
                     </a>
-                    <a href="{% url 'public_centres' %}" class="nav-link">
+                    <a href="{% url 'public:centres' %}" class="nav-link">
                         <i class="fas fa-building me-1"></i> Centers
                     </a>
-                    <a href="{% url 'about' %}" class="nav-link">
+                    <a href="{% url 'public:about' %}" class="nav-link">
                         <i class="fas fa-info-circle me-1"></i> About
                     </a>
-                    <a href="{% url 'contact' %}" class="nav-link">
+                    <a href="{% url 'public:contact' %}" class="nav-link">
                         <i class="fas fa-envelope me-1"></i> Contact
                     </a>
-                    <a href="{% url 'registration:certificate' %}" class="nav-link">
-                        <i class="fas fa-certificate me-1"></i> Certificate
+                    <a href="{% url 'registration:user_profile' %}" class="nav-link">
+                        <i class="fas fa-id-card me-1"></i> My Profile
                     </a>
                     
                     {% if user.is_authenticated and user.is_staff %}
@@ -432,9 +449,6 @@
                                 <li><a class="dropdown-item" href="{% url 'dashboard:index' %}">
                                     <i class="fas fa-tachometer-alt me-2"></i> Dashboard
                                 </a></li>
-                                <li><a class="dropdown-item" href="#">
-                                    <i class="fas fa-user me-2"></i> Profile
-                                </a></li>
                                 <li><hr class="dropdown-divider"></li>
                                 <li><a class="dropdown-item" href="{% url 'account:logout' %}">
                                     <i class="fas fa-sign-out-alt me-2"></i> Logout
@@ -442,7 +456,7 @@
                             </ul>
                         </div>
                     {% else %}
-                        <a href="{% url 'account:login' %}" class="btn btn-nav-outline btn-nav">
+                        <a href="{% url 'account:login' %}" class="btn-nav-outline btn-nav">
                             <i class="fas fa-lock me-1"></i> Admin Login
                         </a>
                     {% endif %}
@@ -461,7 +475,7 @@
     <div class="mobile-menu" id="mobileMenu">
         <div class="mobile-menu-header">
             <div class="d-flex justify-content-between align-items-center">
-                <h5 class="mb-0">Menu</h5>
+                <h5 class="mb-0"><i class="fas fa-bars me-2"></i>Menu</h5>
                 <button class="btn btn-sm btn-light" id="closeMobileMenu">
                     <i class="fas fa-times"></i>
                 </button>
@@ -479,23 +493,23 @@
             {% endif %}
         </div>
         <div class="mobile-menu-body">
-            <a href="{% url 'home' %}" class="nav-link">
+            <a href="{% url 'public:home' %}" class="nav-link">
                 <i class="fas fa-home me-2"></i> Home
             </a>
-            <a href="{% url 'public_courses' %}" class="nav-link">
+            <a href="{% url 'public:courses' %}" class="nav-link">
                 <i class="fas fa-book me-2"></i> Courses
             </a>
-            <a href="{% url 'public_centres' %}" class="nav-link">
+            <a href="{% url 'public:centres' %}" class="nav-link">
                 <i class="fas fa-building me-2"></i> Centers
             </a>
-            <a href="{% url 'about' %}" class="nav-link">
+            <a href="{% url 'public:about' %}" class="nav-link">
                 <i class="fas fa-info-circle me-2"></i> About
             </a>
-            <a href="{% url 'contact' %}" class="nav-link">
+            <a href="{% url 'public:contact' %}" class="nav-link">
                 <i class="fas fa-envelope me-2"></i> Contact
             </a>
-            <a href="{% url 'registration:certificate' %}" class="nav-link">
-                <i class="fas fa-certificate me-2"></i> Certificate
+            <a href="{% url 'registration:user_profile' %}" class="nav-link">
+                <i class="fas fa-id-card me-2"></i> My Profile
             </a>
             
             {% if user.is_authenticated and user.is_staff %}
@@ -506,8 +520,8 @@
                     <i class="fas fa-sign-out-alt me-2"></i> Logout
                 </a>
             {% else %}
-                <div class="border-top pt-3 mt-3">
-                    <a href="{% url 'account:login' %}" class="btn btn-nav-primary w-100">
+                <div class="border-top pt-3 mt-3 px-3">
+                    <a href="{% url 'account:login' %}" class="btn btn-primary w-100">
                         <i class="fas fa-lock me-1"></i> Admin Login
                     </a>
                 </div>
@@ -520,7 +534,7 @@
         {% if messages %}
             <div class="container mt-3">
                 {% for message in messages %}
-                    <div class="alert alert-{{ message.tags }} alert-dismissible fade show shadow-sm" role="alert">
+                    <div class="alert alert-{{ message.tags }} alert-dismissible fade show shadow-sm animate-fade-in" role="alert">
                         <i class="fas fa-{% if message.tags == 'success' %}check-circle{% elif message.tags == 'error' %}exclamation-circle{% else %}info-circle{% endif %} me-2"></i>
                         {{ message }}
                         <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
@@ -535,10 +549,12 @@
     <!-- Footer -->
     <footer class="mt-5">
         <div class="container py-5">
-            <div class="row">
+            <div class="row g-4">
                 <div class="col-md-4 mb-4 mb-md-0">
-                    <h5 class="text-white mb-3">About Us</h5>
-                    <p>Empowering careers through quality education and professional training. An initiative by NIELIT, Ministry of Electronics & IT, Government of India.</p>
+                    <h5 class="text-white mb-3">
+                        <i class="fas fa-info-circle me-2"></i>About Us
+                    </h5>
+                    <p class="small">Empowering careers through quality education and professional training. An initiative by NIELIT, Ministry of Electronics & IT, Government of India.</p>
                     <div class="social-links mt-3">
                         <a href="#" class="text-white-50 me-3"><i class="fab fa-facebook-f fa-lg"></i></a>
                         <a href="#" class="text-white-50 me-3"><i class="fab fa-twitter fa-lg"></i></a>
@@ -547,36 +563,43 @@
                     </div>
                 </div>
                 <div class="col-md-2 mb-4 mb-md-0">
-                    <h5 class="text-white mb-3">Quick Links</h5>
+                    <h5 class="text-white mb-3">
+                        <i class="fas fa-link me-2"></i>Quick Links
+                    </h5>
                     <ul class="list-unstyled footer-links">
-                        <li><a href="{% url 'home' %}">Home</a></li>
-                        <li><a href="{% url 'public_courses' %}">Courses</a></li>
-                        <li><a href="{% url 'about' %}">About Us</a></li>
-                        <li><a href="{% url 'contact' %}">Contact</a></li>
+                        <li><a href="{% url 'public:home' %}">Home</a></li>
+                        <li><a href="{% url 'public:courses' %}">Courses</a></li>
+                        <li><a href="{% url 'public:about' %}">About Us</a></li>
+                        <li><a href="{% url 'public:contact' %}">Contact</a></li>
                     </ul>
                 </div>
                 <div class="col-md-3 mb-4 mb-md-0">
-                    <h5 class="text-white mb-3">Resources</h5>
+                    <h5 class="text-white mb-3">
+                        <i class="fas fa-cogs me-2"></i>Resources
+                    </h5>
                     <ul class="list-unstyled footer-links">
-                        <li><a href="#">Student Portal</a></li>
-                        <li><a href="{% url 'registration:certificate' %}">Download Certificate</a></li>
+                        <li><a href="{% url 'registration:user_profile' %}">Student Portal</a></li>
+                        <li><a href="{% url 'registration:user_profile' %}">Download Certificate</a></li>
                         <li><a href="#">FAQs</a></li>
                         <li><a href="#">Terms & Conditions</a></li>
+                        <li><a href="#">Privacy Policy</a></li>
                     </ul>
                 </div>
                 <div class="col-md-3">
-                    <h5 class="text-white mb-3">Contact Info</h5>
+                    <h5 class="text-white mb-3">
+                        <i class="fas fa-address-card me-2"></i>Contact Info
+                    </h5>
                     <ul class="list-unstyled footer-links">
-                        <li><i class="fas fa-map-marker-alt me-2"></i> New Delhi, India</li>
-                        <li><i class="fas fa-phone me-2"></i> +91 11 12345678</li>
-                        <li><i class="fas fa-envelope me-2"></i> info@nielit.gov.in</li>
+                        <li class="mb-2"><i class="fas fa-map-marker-alt me-2"></i> New Delhi, India</li>
+                        <li class="mb-2"><i class="fas fa-phone me-2"></i> +91 11 12345678</li>
+                        <li class="mb-2"><i class="fas fa-envelope me-2"></i> info@nielit.gov.in</li>
                     </ul>
                 </div>
             </div>
             <hr class="my-4 bg-secondary">
             <div class="row">
                 <div class="col-12 text-center">
-                    <p class="mb-0">&copy; 2026 - NIELIT Delhi. All rights reserved. | Designed for Excellence</p>
+                    <p class="mb-0 small">&copy; 2026 - NIELIT Delhi. All rights reserved. | Designed for Excellence</p>
                 </div>
             </div>
         </div>
@@ -620,9 +643,15 @@
             document.body.style.overflow = '';
         }
         
-        mobileMenuBtn.addEventListener('click', openMobileMenu);
-        closeMobileMenu.addEventListener('click', closeMobileMenuFunc);
-        mobileOverlay.addEventListener('click', closeMobileMenuFunc);
+        if (mobileMenuBtn) {
+            mobileMenuBtn.addEventListener('click', openMobileMenu);
+        }
+        if (closeMobileMenu) {
+            closeMobileMenu.addEventListener('click', closeMobileMenuFunc);
+        }
+        if (mobileOverlay) {
+            mobileOverlay.addEventListener('click', closeMobileMenuFunc);
+        }
         
         // Close mobile menu on window resize
         window.addEventListener('resize', function() {
@@ -635,7 +664,8 @@
         const currentLocation = window.location.pathname;
         const navLinks = document.querySelectorAll('.nav-link');
         navLinks.forEach(link => {
-            if (link.getAttribute('href') === currentLocation) {
+            const href = link.getAttribute('href');
+            if (href && (currentLocation === href || (href !== '/' && currentLocation.startsWith(href)))) {
                 link.classList.add('active');
             }
         });

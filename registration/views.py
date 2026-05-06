@@ -1,95 +1,99 @@
-from django.shortcuts import render, redirect, get_object_or_404
+from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib import messages
-from django.http import HttpResponse
-from .models import Student
-from .forms import StudentRegistrationForm, CertificateCheckForm
-from reportlab.pdfgen import canvas
-from reportlab.lib.pagesizes import letter
-from reportlab.lib.units import inch
-from io import BytesIO
-from datetime import datetime
+from django.core.paginator import Paginator
+from django.db import models
+from django.urls import reverse
+from course.models import Course
+from .models import Student, Certificate
+from .forms import StudentRegistrationForm, UserLookupForm
 
-def register_student(request):
+
+
+def register_course(request, course_id=None):
+    """Course registration page with pre-selected course"""
+    
     if request.method == 'POST':
         form = StudentRegistrationForm(request.POST)
         if form.is_valid():
             student = form.save()
-            messages.success(request, f'Registration successful! Your Registration ID: {student.id}')
-            return redirect('registration:registration_success', student_id=student.id)
+            messages.success(request, f'Registration successful! Your Registration Number is: {student.registration_number}')
+            return redirect('registration:registration_success', reg_number=student.registration_number)
         else:
             messages.error(request, 'Please correct the errors below.')
     else:
-        form = StudentRegistrationForm()
+        initial = {}
+        if course_id:
+            course = get_object_or_404(Course, id=course_id, is_active=True)
+            if not course.is_available_for_registration():
+                messages.error(request, f'Sorry, {course.course_name} is no longer available for registration.')
+                return redirect('course:public_courses')
+            initial['course_enrolled'] = course
+        
+        form = StudentRegistrationForm(initial=initial)
     
-    return render(request, 'registration/register.html', {'form': form})
+    context = {
+        'form': form,
+        'course_readonly': course_id is not None,
+        'pre_selected_course': get_object_or_404(Course, id=course_id) if course_id else None
+    }
+    return render(request, 'registration/register.html', context)
 
-def registration_success(request, student_id):
-    student = get_object_or_404(Student, id=student_id)
+def registration_success(request, reg_number):
+    """Registration success page"""
+    student = get_object_or_404(Student, registration_number=reg_number)
     return render(request, 'registration/registration_success.html', {'student': student})
 
-def download_certificate(request):
-    form = CertificateCheckForm()
-    student = None
-    error_message = None
+
+def user_profile(request):
+    """User profile lookup page - no authentication required"""
+    students = None
+    lookup_done = False
     
     if request.method == 'POST':
-        form = CertificateCheckForm(request.POST)
+        form = UserLookupForm(request.POST)
         if form.is_valid():
-            mobile_number = form.cleaned_data['mobile_number']
-            try:
-                student = Student.objects.get(mobile_number=mobile_number)
-                if student.is_approved:
-                    return generate_certificate_pdf(student)
-                else:
-                    error_message = "Your certificate is not approved yet. Please contact the administration."
-            except Student.DoesNotExist:
-                error_message = "No registration found with this mobile number."
+            lookup_by = form.cleaned_data['lookup_by']
+            email_id = form.cleaned_data.get('email_id')
+            mobile_number = form.cleaned_data.get('mobile_number')
+            
+            if lookup_by == 'email' and email_id:
+                students = Student.objects.filter(email_id=email_id).exclude(status='cancelled')
+                lookup_done = True
+                if not students.exists():
+                    messages.info(request, 'No registrations found with this email address.')
+            elif lookup_by == 'mobile' and mobile_number:
+                students = Student.objects.filter(mobile_number=mobile_number).exclude(status='cancelled')
+                lookup_done = True
+                if not students.exists():
+                    messages.info(request, 'No registrations found with this mobile number.')
+    else:
+        form = UserLookupForm()
     
-    return render(request, 'registration/certificate_download.html', {
+    context = {
         'form': form,
-        'error_message': error_message
-    })
+        'students': students,
+        'lookup_done': lookup_done,
+    }
+    return render(request, 'registration/user_profile.html', context)
 
-def generate_certificate_pdf(student):
-    buffer = BytesIO()
-    p = canvas.Canvas(buffer, pagesize=letter)
-    width, height = letter
-    
-    # Add border
-    p.setStrokeColorRGB(0.2, 0.5, 0.8)
-    p.setLineWidth(5)
-    p.rect(50, 50, width - 100, height - 100)
-    
-    # Add title
-    p.setFont("Helvetica-Bold", 24)
-    p.setFillColorRGB(0.2, 0.5, 0.8)
-    p.drawCentredString(width/2, height - 100, "CERTIFICATE OF COMPLETION")
-    
-    # Add content
-    p.setFont("Helvetica", 12)
-    p.setFillColorRGB(0, 0, 0)
-    p.drawCentredString(width/2, height - 150, "This is to certify that")
-    
-    p.setFont("Helvetica-Bold", 18)
-    p.drawCentredString(width/2, height - 190, student.name)
-    
-    p.setFont("Helvetica", 12)
-    p.drawCentredString(width/2, height - 230, f"has successfully completed the course")
-    
-    p.setFont("Helvetica-Bold", 14)
-    p.drawCentredString(width/2, height - 270, student.course_enrolled.course_name)
-    
-    p.setFont("Helvetica", 12)
-    p.drawCentredString(width/2, height - 310, f"at {student.preferred_centre.centre_name}")
-    
-    p.setFont("Helvetica", 10)
-    p.drawCentredString(width/2, height - 370, f"Certificate ID: {student.id}")
-    p.drawCentredString(width/2, height - 390, f"Date of Issue: {datetime.now().strftime('%B %d, %Y')}")
-    
-    p.showPage()
-    p.save()
-    
-    buffer.seek(0)
-    response = HttpResponse(buffer, content_type='application/pdf')
-    response['Content-Disposition'] = f'attachment; filename="certificate_{student.mobile_number}.pdf"'
-    return response
+def download_certificate(request, reg_number):
+    try:
+        student = Student.objects.get(registration_number=reg_number)
+        if student.status != 'completed':
+            messages.error(request, 'Certificate is only available for completed courses.')
+            return redirect('registration:user_profile')
+        
+        certificate, created = Certificate.objects.get_or_create(student=student)
+        
+        return render(request, 'registration/certificate_view.html', {
+            'student': student,
+            'certificate': certificate
+        })
+    except Student.DoesNotExist:
+        messages.error(request, 'Registration not found.')
+        return redirect('registration:user_profile')
+
+def verify_certificate(request, cert_number):
+    """Public certificate verification"""
+    certificate = get_object_or_404(Certificate, certificate_number=cert_number)
+    return render(request, 'registration/verify_certificate.html', {'certificate': certificate})

@@ -1,0 +1,118 @@
+{% load static %}
+<div class="card course-card shadow-sm h-100 border-0 rounded-4 overflow-hidden">
+    <!-- Course Image with Overlay -->
+    <div class="position-relative">
+        {% if course.image %}
+        <img src="{{ course.image.url }}" class="course-img w-100" alt="{{ course.course_name }}" style="height: 220px; object-fit: cover;">
+        {% else %}
+        <div class="course-img bg-gradient-primary d-flex align-items-center justify-content-center" style="height: 220px; background: linear-gradient(135deg, #1e3a8a, #3b82f6);">
+            <i class="fas fa-graduation-cap fa-5x text-white opacity-50"></i>
+        </div>
+        {% endif %}
+        
+        <!-- Fee Badge -->
+        <div class="position-absolute top-0 end-0 m-3">
+            {% if course.is_free %}
+            <span class="badge bg-success rounded-pill px-3 py-2 fs-6">
+                <i class="fas fa-gift me-1"></i>Free
+            </span>
+            {% else %}
+            <span class="badge bg-warning text-dark rounded-pill px-3 py-2 fs-6">
+                <i class="fas fa-tag me-1"></i>{{ course.display_fees }}
+            </span>
+            {% endif %}
+        </div>
+        
+        <!-- Mode Badge -->
+        <div class="position-absolute top-0 start-0 m-3">
+            <span class="badge bg-dark rounded-pill px-3 py-2">
+                <i class="fas fa-{% if course.mode == 'online' %}laptop{% elif course.mode == 'offline' %}building{% else %}sync{% endif %} me-1"></i>
+                {{ course.get_mode_display }}
+            </span>
+        </div>
+        
+        <!-- Course Type Badge -->
+        {% if course.course_type and course.course_type != 'regular' %}
+        <div class="position-absolute bottom-0 start-0 m-3">
+            {% if course.course_type == 'workshop' %}
+            <span class="badge bg-info rounded-pill px-3 py-2">
+                <i class="fas fa-calendar-day me-1"></i> Workshop
+            </span>
+            {% elif course.course_type == 'seminar' %}
+            <span class="badge bg-info rounded-pill px-3 py-2">
+                <i class="fas fa-chalkboard-user me-1"></i> Seminar
+            </span>
+            {% elif course.course_type == 'webinar' %}
+            <span class="badge bg-info rounded-pill px-3 py-2">
+                <i class="fas fa-video me-1"></i> Webinar
+            </span>
+            {% endif %}
+        </div>
+        {% endif %}
+    </div>
+    
+    <div class="card-body p-4">
+        <h5 class="card-title fw-bold mb-2">{{ course.course_name }}</h5>
+        <p class="card-text small text-muted mb-3">{{ course.course_desc|truncatewords:15 }}</p>
+        
+        <!-- Course Meta Info -->
+        <div class="d-flex justify-content-between align-items-center mb-3 pb-2 border-bottom">
+            <div class="small text-muted">
+                <i class="fas fa-clock text-primary me-1"></i> 
+                {% if course.course_duration %}
+                    {{ course.course_duration }}
+                {% elif course.course_type and course.course_type != 'regular' %}
+                    {{ course.get_course_type_display }}
+                {% else %}
+                    Flexible Duration
+                {% endif %}
+            </div>
+            <div class="small text-muted">
+                <i class="fas fa-calendar-alt text-primary me-1"></i> 
+                {% if course.course_type == 'workshop' or course.course_type == 'seminar' or course.course_type == 'webinar' %}
+                    {% if course.event_date %}
+                        {{ course.event_date|date:"d M Y" }}
+                    {% else %}
+                        Date TBA
+                    {% endif %}
+                {% else %}
+                    {% if course.start_date %}
+                        {{ course.start_date|date:"d M Y" }}
+                    {% else %}
+                        Date TBA
+                    {% endif %}
+                {% endif %}
+            </div>
+        </div>
+        
+        <!-- Tags -->
+        <div class="d-flex flex-wrap gap-2 mb-3">
+            {% if course.course_status == 'open' %}
+            <span class="badge bg-success bg-opacity-10 text-success rounded-pill">
+                <i class="fas fa-check-circle me-1"></i>Open for Registration
+            </span>
+            {% elif course.course_status == 'ongoing' %}
+            <span class="badge bg-info bg-opacity-10 text-info rounded-pill">
+                <i class="fas fa-play-circle me-1"></i>Ongoing
+            </span>
+            {% endif %}
+            
+            {% if course.is_featured %}
+            <span class="badge bg-warning bg-opacity-10 text-warning rounded-pill">
+                <i class="fas fa-star me-1"></i>Featured
+            </span>
+            {% endif %}
+            
+            {% if course.max_seats and course.max_seats > 0 and course.get_seats_available <= 5 and course.get_seats_available > 0 %}
+            <span class="badge bg-danger bg-opacity-10 text-danger rounded-pill">
+                <i class="fas fa-exclamation-circle me-1"></i>Only {{ course.get_seats_available }} seats left
+            </span>
+            {% endif %}
+        </div>
+    </div>
+    <div class="card-footer bg-white border-0 pb-4 px-4">
+        <a href="{% url 'public:course_detail' course.slug %}" class="btn btn-primary w-100 rounded-pill">
+            View Details <i class="fas fa-arrow-right ms-2"></i>
+        </a>
+    </div>
+</div>

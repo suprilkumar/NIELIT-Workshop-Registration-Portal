@@ -1,47 +1,529 @@
-{% extends 'base.html' %}
+{% extends 'public/base.html' %}
 
-{% block title %}Student Registration{% endblock %}
+{% block title %}Course Registration - NIELIT{% endblock %}
+
+{% block extra_css %}
+<style>
+    .registration-wrapper {
+        background: linear-gradient(135deg, #f0f2f5 0%, #f8fafc 100%);
+        min-height: calc(100vh - 200px);
+    }
+    
+    .course-hero-card {
+        background: white;
+        border-radius: 20px;
+        overflow: hidden;
+        box-shadow: 0 10px 40px rgba(0,0,0,0.08);
+        margin-bottom: 30px;
+        transition: transform 0.3s ease;
+    }
+    
+    .course-hero-card:hover {
+        transform: translateY(-3px);
+    }
+    
+    .course-hero-header {
+        background: linear-gradient(135deg, #1e3a8a 0%, #2563eb 100%);
+        padding: 20px 30px;
+        color: white;
+    }
+    
+    .course-hero-body {
+        padding: 25px 30px;
+    }
+    
+    .fee-badge {
+        background: #10b981;
+        padding: 8px 20px;
+        border-radius: 30px;
+        font-weight: 600;
+        font-size: 1.2rem;
+    }
+    
+    .mode-badge {
+        padding: 6px 15px;
+        border-radius: 20px;
+        font-size: 0.85rem;
+        font-weight: 500;
+    }
+    
+    .mode-online {
+        background: #10b98120;
+        color: #059669;
+        border: 1px solid #10b981;
+    }
+    
+    .mode-offline {
+        background: #f59e0b20;
+        color: #d97706;
+        border: 1px solid #f59e0b;
+    }
+    
+    .mode-hybrid {
+        background: #8b5cf620;
+        color: #7c3aed;
+        border: 1px solid #8b5cf6;
+    }
+    
+    .info-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 15px;
+        margin-top: 15px;
+    }
+    
+    .info-item {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 10px;
+        background: #f8fafc;
+        border-radius: 12px;
+    }
+    
+    .info-icon {
+        width: 40px;
+        height: 40px;
+        background: #e0e7ff;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #1e3a8a;
+    }
+    
+    .form-card {
+        background: white;
+        border-radius: 20px;
+        box-shadow: 0 10px 40px rgba(0,0,0,0.08);
+        overflow: hidden;
+    }
+    
+    .form-header {
+        background: #f8fafc;
+        padding: 20px 30px;
+        border-bottom: 2px solid #e5e7eb;
+    }
+    
+    .form-body {
+        padding: 30px;
+    }
+    
+    .form-section {
+        margin-bottom: 35px;
+    }
+    
+    .section-title {
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: #1e3a8a;
+        margin-bottom: 20px;
+        padding-bottom: 10px;
+        border-bottom: 2px solid #e5e7eb;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+    
+    .section-title i {
+        font-size: 1.2rem;
+    }
+    
+    .form-label {
+        font-weight: 500;
+        margin-bottom: 8px;
+        color: #1e293b;
+    }
+    
+    .required-star {
+        color: #dc2626;
+        margin-left: 4px;
+    }
+    
+    .form-control, .form-select {
+        border: 1px solid #e2e8f0;
+        border-radius: 10px;
+        padding: 10px 15px;
+        transition: all 0.3s ease;
+    }
+    
+    .form-control:focus, .form-select:focus {
+        border-color: #1e3a8a;
+        box-shadow: 0 0 0 3px rgba(30,58,138,0.1);
+    }
+    
+    .btn-submit {
+        background: linear-gradient(135deg, #1e3a8a 0%, #2563eb 100%);
+        border: none;
+        padding: 12px 35px;
+        border-radius: 30px;
+        font-weight: 500;
+        transition: all 0.3s ease;
+    }
+    
+    .btn-submit:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(30,58,138,0.3);
+    }
+    
+    .btn-outline-custom {
+        border: 2px solid #e2e8f0;
+        padding: 12px 30px;
+        border-radius: 30px;
+        font-weight: 500;
+        transition: all 0.3s ease;
+    }
+    
+    .btn-outline-custom:hover {
+        border-color: #1e3a8a;
+        background: #f8fafc;
+    }
+    
+    .alert-custom {
+        border-radius: 12px;
+        border-left: 4px solid;
+    }
+    
+    .centre-hidden {
+        display: none;
+    }
+    
+    .centre-visible {
+        display: block;
+    }
+    
+    .status-badge {
+        padding: 8px 20px;
+        border-radius: 30px;
+        font-weight: 500;
+        font-size: 0.85rem;
+    }
+    
+    .status-open {
+        background: #10b98120;
+        color: #059669;
+    }
+    
+    .status-closed {
+        background: #ef444420;
+        color: #dc2626;
+    }
+    
+    @media (max-width: 768px) {
+        .course-hero-header, .course-hero-body {
+            padding: 20px;
+        }
+        .form-body {
+            padding: 20px;
+        }
+        .info-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+{% endblock %}
 
 {% block content %}
-<div class="container mt-4">
-    <div class="row justify-content-center">
-        <div class="col-md-8">
-            <div class="card shadow">
-                <div class="card-header bg-primary text-white">
-                    <h3 class="mb-0">Student Registration Form</h3>
-                </div>
-                <div class="card-body">
-                    <form method="post">
-                        {% csrf_token %}
-                        
-                        {% for field in form %}
-                            <div class="mb-3">
-                                <label for="{{ field.id_for_label }}" class="form-label">
-                                    {{ field.label }}
-                                    {% if field.field.required %}
-                                        <span class="text-danger">*</span>
+<div class="registration-wrapper py-5">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-10">
+                
+                <!-- Course Information Hero Card -->
+                {% if pre_selected_course %}
+                <div class="course-hero-card">
+                    <div class="course-hero-header">
+                        <div class="d-flex justify-content-between align-items-start flex-wrap gap-3">
+                            <div>
+                                <h2 class="mb-2 fw-bold">{{ pre_selected_course.course_name }}</h2>
+                                <div class="d-flex gap-2 flex-wrap">
+                                    <span class="mode-badge mode-{{ pre_selected_course.mode }}">
+                                        <i class="fas fa-{% if pre_selected_course.mode == 'online' %}globe{% elif pre_selected_course.mode == 'offline' %}building{% else %}sync{% endif %} me-1"></i>
+                                        {{ pre_selected_course.get_mode_display }}
+                                    </span>
+                                    {% if pre_selected_course.course_type != 'regular' %}
+                                    <span class="mode-badge" style="background: #8b5cf620; color: #7c3aed;">
+                                        <i class="fas fa-calendar-day me-1"></i>
+                                        {{ pre_selected_course.get_course_type_display }}
+                                    </span>
                                     {% endif %}
-                                </label>
-                                {{ field }}
-                                {% if field.help_text %}
-                                    <small class="form-text text-muted">{{ field.help_text }}</small>
-                                {% endif %}
-                                {% for error in field.errors %}
-                                    <div class="text-danger">{{ error }}</div>
+                                </div>
+                            </div>
+                            <div class="text-end">
+                                <div class="fee-badge text-white text-center">
+                                    {{ pre_selected_course.display_fees }}
+                                </div>
+                                <div class="mt-2">
+                                    {% if pre_selected_course.is_available_for_registration %}
+                                    <span class="status-badge status-open">
+                                        <i class="fas fa-check-circle me-1"></i> Open for Registration
+                                    </span>
+                                    {% else %}
+                                    <span class="status-badge status-closed">
+                                        <i class="fas fa-times-circle me-1"></i> Registration Closed
+                                    </span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="course-hero-body">
+                        <div class="info-grid">
+                            <div class="info-item">
+                                <div class="info-icon">
+                                    <i class="fas fa-clock"></i>
+                                </div>
+                                <div>
+                                    <div class="small text-muted">Duration</div>
+                                    <div class="fw-semibold">{{ pre_selected_course.course_duration|default:"Flexible" }}</div>
+                                </div>
+                            </div>
+                            <div class="info-item">
+                                <div class="info-icon">
+                                    <i class="fas fa-calendar-alt"></i>
+                                </div>
+                                <div>
+                                    <div class="small text-muted">Schedule</div>
+                                    <div class="fw-semibold">
+                                        {% if pre_selected_course.course_type == 'workshop' %}
+                                            {{ pre_selected_course.event_date|date:"d M Y"|default:"TBA" }}
+                                        {% else %}
+                                            {{ pre_selected_course.start_date|date:"d M Y"|default:"TBA" }}
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                           
+                            <div class="info-item">
+                                <div class="info-icon">
+                                    <i class="fas fa-map-marker-alt"></i>
+                                </div>
+                                <div>
+                                    <div class="small text-muted">Mode</div>
+                                    <div class="fw-semibold">{{ pre_selected_course.get_mode_display }}</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+
+                <!-- Registration Form Card -->
+                <div class="form-card">
+                    <div class="form-header">
+                        <h4 class="mb-0 fw-bold text-primary">
+                            <i class="fas fa-edit me-2"></i>Registration Form
+                        </h4>
+                        <p class="text-muted mb-0 mt-1 small">Please fill in your details accurately</p>
+                    </div>
+                    <div class="form-body">
+                        <form method="post" novalidate id="registrationForm">
+                            {% csrf_token %}
+                            
+                            {% if form.non_field_errors %}
+                            <div class="alert alert-danger alert-custom mb-4">
+                                {% for error in form.non_field_errors %}
+                                    <i class="fas fa-exclamation-circle me-2"></i>{{ error }}
                                 {% endfor %}
                             </div>
-                        {% endfor %}
-                        
-                        <div class="d-grid gap-2">
-                            <button type="submit" class="btn btn-primary btn-lg">
-                                <i class="fas fa-check-circle"></i> Submit Registration
-                            </button>
-                            <a href="{% url 'home' %}" class="btn btn-secondary">Cancel</a>
-                        </div>
-                    </form>
+                            {% endif %}
+
+                            <!-- Personal Information -->
+                            <div class="form-section">
+                                <div class="section-title">
+                                    <i class="fas fa-user-graduate"></i>
+                                    <span>Personal Information</span>
+                                </div>
+                                <div class="row g-3">
+                                    <div class="col-md-6">
+                                        <label class="form-label">Full Name <span class="required-star">*</span></label>
+                                        {{ form.name }}
+                                        {% if form.name.errors %}
+                                            <div class="text-danger small mt-1">{{ form.name.errors }}</div>
+                                        {% endif %}
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label">Father's Name <span class="required-star">*</span></label>
+                                        {{ form.father_name }}
+                                        {% if form.father_name.errors %}
+                                            <div class="text-danger small mt-1">{{ form.father_name.errors }}</div>
+                                        {% endif %}
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label">Date of Birth <span class="required-star">*</span></label>
+                                        {{ form.date_of_birth }}
+                                        {% if form.date_of_birth.errors %}
+                                            <div class="text-danger small mt-1">{{ form.date_of_birth.errors }}</div>
+                                        {% endif %}
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label">Category <span class="required-star">*</span></label>
+                                        {{ form.category }}
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Contact Information -->
+                            <div class="form-section">
+                                <div class="section-title">
+                                    <i class="fas fa-phone-alt"></i>
+                                    <span>Contact Information</span>
+                                </div>
+                                <div class="row g-3">
+                                    <div class="col-md-6">
+                                        <label class="form-label">Email Address <span class="required-star">*</span></label>
+                                        {{ form.email_id }}
+                                        {% if form.email_id.errors %}
+                                            <div class="text-danger small mt-1">{{ form.email_id.errors }}</div>
+                                        {% endif %}
+                                        <small class="text-muted">One email per course registration</small>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label">Mobile Number <span class="required-star">*</span></label>
+                                        {{ form.mobile_number }}
+                                        {% if form.mobile_number.errors %}
+                                            <div class="text-danger small mt-1">{{ form.mobile_number.errors }}</div>
+                                        {% endif %}
+                                        <small class="text-muted">10-digit number</small>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Course Selection -->
+                            <div class="form-section">
+                                <div class="section-title">
+                                    <i class="fas fa-graduation-cap"></i>
+                                    <span>Course Selection</span>
+                                </div>
+                                <div class="row g-3">
+                                    <div class="col-md-6">
+                                        <label class="form-label">Select Course <span class="required-star">*</span></label>
+                                        {% if course_readonly %}
+                                            <div class="bg-light p-3 rounded-3 fw-semibold">
+                                                {{ pre_selected_course.course_name }}
+                                                <input type="hidden" name="course_enrolled" value="{{ pre_selected_course.id }}" id="id_course_enrolled_hidden">
+                                            </div>
+                                        {% else %}
+                                            {{ form.course_enrolled }}
+                                        {% endif %}
+                                        {% if form.course_enrolled.errors %}
+                                            <div class="text-danger small mt-1">{{ form.course_enrolled.errors }}</div>
+                                        {% endif %}
+                                    </div>
+                                    
+                                    <!-- Centre Selection - Will be hidden for online courses -->
+                                    <div class="col-md-6" id="centreSection">
+                                        <label class="form-label" id="centreLabel">Preferred Centre <span id="centreRequired" class="required-star">*</span></label>
+                                        <div id="centreSelectContainer">
+                                            {{ form.preferred_centre }}
+                                        </div>
+                                        <small class="text-muted" id="centreHelpText">Select your preferred training centre</small>
+                                        {% if form.preferred_centre.errors %}
+                                            <div class="text-danger small mt-1">{{ form.preferred_centre.errors }}</div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Submit Buttons -->
+                            <div class="d-flex flex-wrap gap-3 justify-content-end mt-4 pt-3">
+                                <a href="{% url 'public:courses' %}" class="btn btn-outline-custom">
+                                    <i class="fas fa-arrow-left me-2"></i>Browse Courses
+                                </a>
+                                <button type="submit" class="btn btn-submit text-white" id="submitBtn">
+                                    <i class="fas fa-paper-plane me-2"></i>Submit Registration
+                                </button>
+                            </div>
+                        </form>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 </div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const courseSelect = document.getElementById('id_course_enrolled');
+        const centreSection = document.getElementById('centreSection');
+        const centreSelect = document.getElementById('id_preferred_centre');
+        const centreRequired = document.getElementById('centreRequired');
+        const centreHelpText = document.getElementById('centreHelpText');
+        const centreLabel = document.getElementById('centreLabel');
+        const hiddenCourseInput = document.getElementById('id_course_enrolled_hidden');
+        
+        function getCourseId() {
+            if (hiddenCourseInput) {
+                return hiddenCourseInput.value;
+            }
+            if (courseSelect) {
+                return courseSelect.value;
+            }
+            return null;
+        }
+        
+        function updateCentreSection() {
+            const courseId = getCourseId();
+            
+            if (!courseId) {
+                // No course selected - show centre section but disabled
+                centreSection.style.display = 'block';
+                centreSelect.innerHTML = '<option value="">Please select a course first</option>';
+                centreSelect.disabled = true;
+                centreRequired.style.display = 'inline';
+                centreHelpText.innerHTML = 'Please select a course first';
+                return;
+            }
+            
+            // Fetch course details to check mode
+            fetch(`/course/api/get-course-centres/?course_id=${courseId}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.mode === 'online') {
+                        // COMPLETELY HIDE centre section for online courses
+                        centreSection.style.display = 'none';
+                        centreSelect.disabled = true;
+                        centreSelect.required = false;
+                    } else {
+                        // SHOW centre section for offline/hybrid courses
+                        centreSection.style.display = 'block';
+                        centreSelect.disabled = false;
+                        centreSelect.required = true;
+                        centreRequired.style.display = 'inline';
+                        
+                        // Populate centres
+                        centreSelect.innerHTML = '<option value="">--------</option>';
+                        
+                        if (data.centres && data.centres.length > 0) {
+                            data.centres.forEach(centre => {
+                                const option = document.createElement('option');
+                                option.value = centre.id;
+                                option.textContent = centre.centre_name || centre.name;
+                                centreSelect.appendChild(option);
+                            });
+                            centreHelpText.innerHTML = '<i class="fas fa-info-circle me-1"></i> Select your preferred training centre';
+                        } else {
+                            centreSelect.innerHTML = '<option value="">No centres available</option>';
+                            centreSelect.disabled = true;
+                            centreHelpText.innerHTML = '<i class="fas fa-exclamation-triangle me-1"></i> No centres available for this course';
+                        }
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    centreSection.style.display = 'block';
+                    centreSelect.innerHTML = '<option value="">Error loading centres</option>';
+                    centreSelect.disabled = true;
+                });
+        }
+        
+        // Initial load
+        if (courseSelect) {
+            courseSelect.addEventListener('change', updateCentreSection);
+        }
+        
+        // Call on page load if course is pre-selected
+        updateCentreSection();
+    });
+</script>
 {% endblock %}
