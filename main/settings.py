@@ -25,7 +25,11 @@ DEBUG = os.environ.get('DEBUG', 'False') == 'True'
 ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS', '').split(',')
 
 
-CSRF_TRUSTED_ORIGINS = ['http://localhost:8000', 'http://127.0.0.1:8000', '16.176.176.158']
+CSRF_TRUSTED_ORIGINS = [
+    'http://localhost:8000',
+    'http://127.0.0.1:8000',
+    'http://16.176.176.158',    # ← remove trailing slash
+]
 
 # For production, also add these
 SESSION_COOKIE_SECURE = not DEBUG
