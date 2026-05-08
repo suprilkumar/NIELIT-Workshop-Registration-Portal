@@ -50,10 +50,11 @@ jobs:
             echo "=== Commit BEFORE pull ==="
             git log --oneline -1
 
-            echo "=== Pulling latest code ==="
-            git pull origin main
+            echo "=== Syncing with GitHub (force) ==="
+            git fetch origin main
+            git reset --hard origin/main
 
-            echo "=== Commit AFTER pull ==="
+            echo "=== Commit AFTER sync ==="
             git log --oneline -1
 
             echo "=== Activating venv ==="
@@ -73,3 +74,4 @@ jobs:
             sudo systemctl restart nginx
 
             echo "=== Deployment successful ==="
+                  
