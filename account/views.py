@@ -10,6 +10,7 @@ from .forms import LoginForm, CreateAdminForm, EditAdminForm, ChangePasswordForm
 from django.contrib.auth.views import PasswordResetView
 from django.contrib.auth.forms import AuthenticationForm
 from django.core.paginator import Paginator
+from django.urls import reverse
 
 def is_admin(user):
     return user.is_authenticated and user.is_staff
@@ -27,10 +28,11 @@ def login_view(request):
             if user is not None:
                 login(request, user)
                 messages.success(request, f'Welcome back, {username}!')
-                
-                # Redirect to next parameter if present
-                next_url = request.GET.get('next', 'dashboard:index')
+    
+            next_url = request.GET.get('next')
+            if next_url:
                 return redirect(next_url)
+            return redirect(reverse('dashboard:index'))
         messages.error(request, 'Invalid username or password')
     else:
         form = AuthenticationForm()
