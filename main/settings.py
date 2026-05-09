@@ -31,10 +31,8 @@ CSRF_TRUSTED_ORIGINS = [
     'http://16.176.176.158',    # ← remove trailing slash
 ]
 
-# For production, also add these
-SESSION_COOKIE_SECURE = not DEBUG
-CSRF_COOKIE_SECURE = not DEBUG
-
+SESSION_COOKIE_SECURE = os.environ.get('SESSION_COOKIE_SECURE', 'False') == 'True'
+CSRF_COOKIE_SECURE = os.environ.get('CSRF_COOKIE_SECURE', 'False') == 'True'
 
 # Application definition
 
