@@ -1,3 +1,5 @@
+# registration/views.py
+
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib import messages
 from django.core.paginator import Paginator
@@ -6,7 +8,6 @@ from django.urls import reverse
 from course.models import Course
 from .models import Student, Certificate
 from .forms import StudentRegistrationForm, UserLookupForm
-
 
 
 def register_course(request, course_id=None):
@@ -26,7 +27,7 @@ def register_course(request, course_id=None):
             course = get_object_or_404(Course, id=course_id, is_active=True)
             if not course.is_available_for_registration():
                 messages.error(request, f'Sorry, {course.course_name} is no longer available for registration.')
-                return redirect('course:public_courses')
+                return redirect('public:courses')
             initial['course_enrolled'] = course
         
         form = StudentRegistrationForm(initial=initial)
@@ -38,6 +39,7 @@ def register_course(request, course_id=None):
     }
     return render(request, 'registration/register.html', context)
 
+
 def registration_success(request, reg_number):
     """Registration success page"""
     student = get_object_or_404(Student, registration_number=reg_number)
@@ -48,31 +50,35 @@ def user_profile(request):
     """User profile lookup page - no authentication required"""
     students = None
     lookup_done = False
+    search_value = None
+    search_type = None
     
     if request.method == 'POST':
-        form = UserLookupForm(request.POST)
-        if form.is_valid():
-            lookup_by = form.cleaned_data['lookup_by']
-            email_id = form.cleaned_data.get('email_id')
-            mobile_number = form.cleaned_data.get('mobile_number')
-            
-            if lookup_by == 'email' and email_id:
-                students = Student.objects.filter(email_id=email_id).exclude(status='cancelled')
-                lookup_done = True
-                if not students.exists():
-                    messages.info(request, 'No registrations found with this email address.')
-            elif lookup_by == 'mobile' and mobile_number:
-                students = Student.objects.filter(mobile_number=mobile_number).exclude(status='cancelled')
-                lookup_done = True
-                if not students.exists():
-                    messages.info(request, 'No registrations found with this mobile number.')
-    else:
-        form = UserLookupForm()
+        # Manually process form data since we're not using Django form
+        lookup_by = request.POST.get('lookup_by', 'email')
+        email_id = request.POST.get('email_id', '').strip()
+        mobile_number = request.POST.get('mobile_number', '').strip()
+        
+        if lookup_by == 'email' and email_id:
+            students = Student.objects.filter(email_id__iexact=email_id).exclude(status='cancelled')
+            lookup_done = True
+            search_value = email_id
+            search_type = 'email'
+            if not students.exists():
+                messages.info(request, f'No registrations found with email: {email_id}')
+        elif lookup_by == 'mobile' and mobile_number:
+            students = Student.objects.filter(mobile_number=mobile_number).exclude(status='cancelled')
+            lookup_done = True
+            search_value = mobile_number
+            search_type = 'mobile'
+            if not students.exists():
+                messages.info(request, f'No registrations found with mobile number: {mobile_number}')
     
     context = {
-        'form': form,
         'students': students,
         'lookup_done': lookup_done,
+        'search_value': search_value,
+        'search_type': search_type,
     }
     return render(request, 'registration/user_profile.html', context)
 
@@ -92,6 +98,7 @@ def download_certificate(request, reg_number):
     except Student.DoesNotExist:
         messages.error(request, 'Registration not found.')
         return redirect('registration:user_profile')
+
 
 def verify_certificate(request, cert_number):
     """Public certificate verification"""

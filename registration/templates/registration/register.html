@@ -1,529 +1,1039 @@
 {% extends 'public/base.html' %}
 
-{% block title %}Course Registration - NIELIT{% endblock %}
+{% block title %}Course Registration - NIELIT Delhi{% endblock %}
 
 {% block extra_css %}
 <style>
-    .registration-wrapper {
-        background: linear-gradient(135deg, #f0f2f5 0%, #f8fafc 100%);
-        min-height: calc(100vh - 200px);
+    :root{
+        --primary:#0f172a;
+        --secondary:#1e3a8a;
+        --accent:#2563eb;
+        --light:#f8fafc;
+        --border:#e2e8f0;
+        --success:#10b981;
+    }
+
+    body{
+        background:#f1f5f9;
+    }
+
+    .registration-page{
+        padding:40px 0 60px;
+    }
+
+    /* =========================
+        PAGE HEADER
+    ========================== */
+    .page-header{
+        background: linear-gradient(135deg,#0f172a 0%, #1e3a8a 45%, #2563eb 100%);
+        border-radius:24px;
+        padding:40px;
+        color:white;
+        margin-bottom:30px;
+        position:relative;
+        overflow:hidden;
+        box-shadow:0 10px 35px rgba(0,0,0,0.12);
+    }
+
+    .page-header::before{
+        content:'';
+        position:absolute;
+        width:300px;
+        height:300px;
+        border-radius:50%;
+        background:rgba(255,255,255,0.08);
+        top:-120px;
+        right:-80px;
+    }
+
+    .page-header::after{
+        content:'';
+        position:absolute;
+        width:220px;
+        height:220px;
+        border-radius:50%;
+        background:rgba(255,255,255,0.06);
+        bottom:-100px;
+        left:-60px;
+    }
+
+    .header-badge{
+        display:inline-flex;
+        align-items:center;
+        gap:8px;
+        padding:8px 16px;
+        border-radius:50px;
+        background:rgba(255,255,255,0.14);
+        backdrop-filter:blur(10px);
+        margin-bottom:18px;
+        font-size:0.9rem;
+        font-weight:500;
+    }
+
+    .page-header h1{
+        font-weight:700;
+        margin-bottom:10px;
+    }
+
+    .page-header p{
+        color:rgba(255,255,255,0.88);
+        max-width:700px;
+        margin-bottom:0;
+    }
+
+    /* =========================
+        MAIN GRID
+    ========================== */
+    .registration-grid{
+        display:grid;
+        grid-template-columns: 1.1fr 0.9fr;
+        gap:28px;
+        align-items:start;
+    }
+
+    /* =========================
+        FORM CARD
+    ========================== */
+    .form-card{
+        background:white;
+        border-radius:24px;
+        overflow:hidden;
+        box-shadow:0 10px 30px rgba(15,23,42,0.08);
+        border:1px solid rgba(226,232,240,0.7);
+    }
+
+    .form-top{
+        padding:28px 30px 22px;
+        border-bottom:1px solid var(--border);
+        background:#fcfdff;
+    }
+
+    .form-title{
+        display:flex;
+        justify-content:space-between;
+        align-items:center;
+        gap:20px;
+        flex-wrap:wrap;
+    }
+
+    .form-title h4{
+        margin:0;
+        font-weight:700;
+        color:#0f172a;
+    }
+
+    .form-title p{
+        margin:5px 0 0;
+        color:#64748b;
+        font-size:0.92rem;
+    }
+
+    /* =========================
+        PROGRESS BAR
+    ========================== */
+    .progress-wrapper{
+        width:220px;
+    }
+
+    .progress{
+        height:10px;
+        border-radius:50px;
+        background:#e2e8f0;
+    }
+
+    .progress-bar{
+        background:linear-gradient(90deg,#1e3a8a,#2563eb);
+        transition:width 0.4s ease;
+    }
+
+    .progress-text{
+        margin-top:8px;
+        font-size:0.85rem;
+        font-weight:600;
+        color:#1e3a8a;
+        text-align:right;
+    }
+
+    .form-body{
+        padding:30px;
+    }
+
+    /* =========================
+        SECTION TITLE
+    ========================== */
+    .form-section{
+        margin-bottom:34px;
+    }
+
+    .section-heading{
+        display:flex;
+        align-items:center;
+        gap:12px;
+        margin-bottom:20px;
+    }
+
+    .section-icon{
+        width:42px;
+        height:42px;
+        border-radius:12px;
+        display:flex;
+        align-items:center;
+        justify-content:center;
+        background:#dbeafe;
+        color:#1e3a8a;
+        font-size:1rem;
+    }
+
+    .section-heading h5{
+        margin:0;
+        font-size:1rem;
+        font-weight:700;
+        color:#0f172a;
+    }
+
+    .section-heading span{
+        font-size:0.85rem;
+        color:#64748b;
+    }
+
+    /* =========================
+        FORM FIELDS
+    ========================== */
+    .form-label{
+        font-weight:600;
+        color:#0f172a;
+        margin-bottom:8px;
+        font-size:0.92rem;
+    }
+
+    .required{
+        color:#dc2626;
+    }
+
+    .form-control,
+    .form-select{
+        min-height:52px;
+        border-radius:14px;
+        border:1px solid #dbe3ee;
+        padding:12px 16px;
+        font-size:0.95rem;
+        transition:all 0.25s ease;
+        background:#fff;
+    }
+
+    .form-control:focus,
+    .form-select:focus{
+        border-color:#2563eb;
+        box-shadow:0 0 0 4px rgba(37,99,235,0.12);
+    }
+
+    .field-hint{
+        margin-top:7px;
+        font-size:0.8rem;
+        color:#64748b;
+    }
+
+    .errorlist{
+        list-style:none;
+        padding:0;
+        margin:6px 0 0;
+        color:#dc2626;
+        font-size:0.84rem;
+    }
+
+    /* =========================
+        BUTTONS
+    ========================== */
+    .btn-register{
+        background:linear-gradient(135deg,#1e3a8a,#2563eb);
+        color:white;
+        border:none;
+        border-radius:14px;
+        padding:14px 26px;
+        font-weight:600;
+        transition:all 0.3s ease;
+    }
+
+    .btn-register:hover{
+        transform:translateY(-2px);
+        box-shadow:0 10px 20px rgba(37,99,235,0.25);
+        color:white;
+    }
+
+    .btn-back{
+        border-radius:14px;
+        padding:14px 24px;
+        font-weight:600;
+        border:1px solid #cbd5e1;
+        background:white;
+        color:#334155;
+    }
+
+    .btn-back:hover{
+        background:#f8fafc;
+    }
+
+    /* =========================
+        COURSE INFO SIDEBAR
+    ========================== */
+    .course-sidebar{
+        position:sticky;
+        top:120px;
+        display:flex;
+        flex-direction:column;
+        gap:24px;
+    }
+
+    .sidebar-card{
+        background:white;
+        border-radius:24px;
+        overflow:hidden;
+        border:1px solid rgba(226,232,240,0.7);
+        box-shadow:0 10px 30px rgba(15,23,42,0.08);
+    }
+
+    .course-banner{
+        background:linear-gradient(135deg,#1e293b,#1e3a8a,#2563eb);
+        color:white;
+        padding:30px;
+        position:relative;
+        overflow:hidden;
+    }
+
+    .course-banner::before{
+        content:'';
+        position:absolute;
+        width:200px;
+        height:200px;
+        border-radius:50%;
+        background:rgba(255,255,255,0.08);
+        right:-60px;
+        top:-70px;
+    }
+
+    .course-badge{
+        display:inline-flex;
+        align-items:center;
+        gap:6px;
+        padding:8px 14px;
+        border-radius:50px;
+        background:rgba(255,255,255,0.14);
+        font-size:0.8rem;
+        margin-bottom:18px;
+    }
+
+    .course-name{
+        font-size:1.5rem;
+        font-weight:700;
+        margin-bottom:12px;
+    }
+
+    .course-fee{
+        font-size:2rem;
+        font-weight:700;
+        margin-bottom:6px;
+    }
+
+    .course-fee small{
+        font-size:0.95rem;
+        opacity:0.8;
+        font-weight:400;
+    }
+
+    .course-content{
+        padding:26px;
+    }
+
+    .info-box{
+        display:flex;
+        gap:14px;
+        margin-bottom:18px;
+        padding-bottom:18px;
+        border-bottom:1px solid #eef2f7;
+    }
+
+    .info-box:last-child{
+        margin-bottom:0;
+        padding-bottom:0;
+        border-bottom:none;
+    }
+
+    .info-box-icon{
+        width:48px;
+        height:48px;
+        border-radius:14px;
+        background:#eff6ff;
+        color:#1d4ed8;
+        display:flex;
+        align-items:center;
+        justify-content:center;
+        flex-shrink:0;
+    }
+
+    .info-box small{
+        color:#64748b;
+        display:block;
+        margin-bottom:3px;
+    }
+
+    .info-box strong{
+        color:#0f172a;
+        font-size:0.95rem;
+    }
+
+    /* =========================
+        GOVT NOTICE CARD
+    ========================== */
+    .govt-card{
+        padding:24px;
+    }
+
+    .govt-card h6{
+        font-weight:700;
+        margin-bottom:16px;
+        color:#0f172a;
+    }
+
+    .govt-list{
+        padding:0;
+        margin:0;
+        list-style:none;
+    }
+
+    .govt-list li{
+        display:flex;
+        gap:12px;
+        margin-bottom:14px;
+        color:#475569;
+        font-size:0.92rem;
+    }
+
+    .govt-list i{
+        color:#16a34a;
+        margin-top:4px;
+    }
+
+    /* Loading Spinner */
+    .loading-spinner {
+        display: inline-block;
+        width: 16px;
+        height: 16px;
+        border: 2px solid rgba(255,255,255,0.3);
+        border-radius: 50%;
+        border-top-color: white;
+        animation: spin 0.6s linear infinite;
+        margin-right: 8px;
+    }
+
+    @keyframes spin {
+        to { transform: rotate(360deg); }
     }
     
-    .course-hero-card {
-        background: white;
-        border-radius: 20px;
-        overflow: hidden;
-        box-shadow: 0 10px 40px rgba(0,0,0,0.08);
-        margin-bottom: 30px;
-        transition: transform 0.3s ease;
+    .btn-register:disabled {
+        opacity: 0.7;
+        transform: none;
     }
-    
-    .course-hero-card:hover {
-        transform: translateY(-3px);
-    }
-    
-    .course-hero-header {
-        background: linear-gradient(135deg, #1e3a8a 0%, #2563eb 100%);
-        padding: 20px 30px;
-        color: white;
-    }
-    
-    .course-hero-body {
-        padding: 25px 30px;
-    }
-    
-    .fee-badge {
-        background: #10b981;
-        padding: 8px 20px;
-        border-radius: 30px;
-        font-weight: 600;
-        font-size: 1.2rem;
-    }
-    
-    .mode-badge {
-        padding: 6px 15px;
-        border-radius: 20px;
-        font-size: 0.85rem;
-        font-weight: 500;
-    }
-    
-    .mode-online {
-        background: #10b98120;
-        color: #059669;
-        border: 1px solid #10b981;
-    }
-    
-    .mode-offline {
-        background: #f59e0b20;
-        color: #d97706;
-        border: 1px solid #f59e0b;
-    }
-    
-    .mode-hybrid {
-        background: #8b5cf620;
-        color: #7c3aed;
-        border: 1px solid #8b5cf6;
-    }
-    
-    .info-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-        gap: 15px;
-        margin-top: 15px;
-    }
-    
-    .info-item {
-        display: flex;
-        align-items: center;
-        gap: 12px;
-        padding: 10px;
-        background: #f8fafc;
-        border-radius: 12px;
-    }
-    
-    .info-icon {
-        width: 40px;
-        height: 40px;
-        background: #e0e7ff;
-        border-radius: 10px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: #1e3a8a;
-    }
-    
-    .form-card {
-        background: white;
-        border-radius: 20px;
-        box-shadow: 0 10px 40px rgba(0,0,0,0.08);
-        overflow: hidden;
-    }
-    
-    .form-header {
-        background: #f8fafc;
-        padding: 20px 30px;
-        border-bottom: 2px solid #e5e7eb;
-    }
-    
-    .form-body {
-        padding: 30px;
-    }
-    
-    .form-section {
-        margin-bottom: 35px;
-    }
-    
-    .section-title {
-        font-size: 1.1rem;
-        font-weight: 600;
-        color: #1e3a8a;
-        margin-bottom: 20px;
-        padding-bottom: 10px;
-        border-bottom: 2px solid #e5e7eb;
-        display: flex;
-        align-items: center;
-        gap: 10px;
-    }
-    
-    .section-title i {
-        font-size: 1.2rem;
-    }
-    
-    .form-label {
-        font-weight: 500;
-        margin-bottom: 8px;
-        color: #1e293b;
-    }
-    
-    .required-star {
-        color: #dc2626;
-        margin-left: 4px;
-    }
-    
-    .form-control, .form-select {
-        border: 1px solid #e2e8f0;
-        border-radius: 10px;
-        padding: 10px 15px;
-        transition: all 0.3s ease;
-    }
-    
-    .form-control:focus, .form-select:focus {
-        border-color: #1e3a8a;
-        box-shadow: 0 0 0 3px rgba(30,58,138,0.1);
-    }
-    
-    .btn-submit {
-        background: linear-gradient(135deg, #1e3a8a 0%, #2563eb 100%);
-        border: none;
-        padding: 12px 35px;
-        border-radius: 30px;
-        font-weight: 500;
-        transition: all 0.3s ease;
-    }
-    
-    .btn-submit:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 5px 15px rgba(30,58,138,0.3);
-    }
-    
-    .btn-outline-custom {
-        border: 2px solid #e2e8f0;
-        padding: 12px 30px;
-        border-radius: 30px;
-        font-weight: 500;
-        transition: all 0.3s ease;
-    }
-    
-    .btn-outline-custom:hover {
-        border-color: #1e3a8a;
-        background: #f8fafc;
-    }
-    
-    .alert-custom {
-        border-radius: 12px;
-        border-left: 4px solid;
-    }
-    
-    .centre-hidden {
-        display: none;
-    }
-    
-    .centre-visible {
-        display: block;
-    }
-    
-    .status-badge {
-        padding: 8px 20px;
-        border-radius: 30px;
-        font-weight: 500;
-        font-size: 0.85rem;
-    }
-    
-    .status-open {
-        background: #10b98120;
-        color: #059669;
-    }
-    
-    .status-closed {
-        background: #ef444420;
-        color: #dc2626;
-    }
-    
-    @media (max-width: 768px) {
-        .course-hero-header, .course-hero-body {
-            padding: 20px;
+
+    /* =========================
+        MOBILE
+    ========================== */
+    @media(max-width:992px){
+        .registration-grid{
+            grid-template-columns:1fr;
         }
-        .form-body {
-            padding: 20px;
+
+        .course-sidebar{
+            position:relative;
+            top:0;
+            order:-1;
         }
-        .info-grid {
-            grid-template-columns: 1fr;
+    }
+
+    @media(max-width:768px){
+
+        .registration-page{
+            padding-top:20px;
+        }
+
+        .page-header{
+            padding:28px 22px;
+            border-radius:20px;
+        }
+
+        .page-header h1{
+            font-size:1.7rem;
+        }
+
+        .form-top,
+        .form-body{
+            padding:22px;
+        }
+
+        .course-banner,
+        .course-content,
+        .govt-card{
+            padding:22px;
+        }
+
+        .progress-wrapper{
+            width:100%;
+        }
+
+        .form-title{
+            align-items:flex-start;
+        }
+
+        .course-name{
+            font-size:1.25rem;
+        }
+
+        .course-fee{
+            font-size:1.7rem;
         }
     }
 </style>
 {% endblock %}
 
 {% block content %}
-<div class="registration-wrapper py-5">
+
+<div class="registration-page">
     <div class="container">
-        <div class="row justify-content-center">
-            <div class="col-lg-10">
-                
-                <!-- Course Information Hero Card -->
-                {% if pre_selected_course %}
-                <div class="course-hero-card">
-                    <div class="course-hero-header">
-                        <div class="d-flex justify-content-between align-items-start flex-wrap gap-3">
-                            <div>
-                                <h2 class="mb-2 fw-bold">{{ pre_selected_course.course_name }}</h2>
-                                <div class="d-flex gap-2 flex-wrap">
-                                    <span class="mode-badge mode-{{ pre_selected_course.mode }}">
-                                        <i class="fas fa-{% if pre_selected_course.mode == 'online' %}globe{% elif pre_selected_course.mode == 'offline' %}building{% else %}sync{% endif %} me-1"></i>
-                                        {{ pre_selected_course.get_mode_display }}
-                                    </span>
-                                    {% if pre_selected_course.course_type != 'regular' %}
-                                    <span class="mode-badge" style="background: #8b5cf620; color: #7c3aed;">
-                                        <i class="fas fa-calendar-day me-1"></i>
-                                        {{ pre_selected_course.get_course_type_display }}
-                                    </span>
-                                    {% endif %}
-                                </div>
+
+        <!-- Page Header -->
+        <div class="page-header">
+            <div class="header-badge">
+                <i class="fas fa-graduation-cap"></i>
+                NIELIT Course Registration
+            </div>
+            <h1>Enroll for a Brighter Future</h1>
+            <p>Fill the application form carefully. All fields marked with <span class="text-warning">*</span> are mandatory.</p>
+        </div>
+
+        <div class="registration-grid">
+
+            <!-- LEFT FORM -->
+            <div class="form-card">
+
+                <div class="form-top">
+                    <div class="form-title">
+
+                        <div>
+                            <h4>
+                                <i class="fas fa-user-edit me-2 text-primary"></i>
+                                Student Registration Form
+                            </h4>
+                            <p>Please fill all mandatory fields accurately.</p>
+                        </div>
+
+                        <!-- PROGRESS -->
+                        <div class="progress-wrapper">
+                            <div class="progress">
+                                <div class="progress-bar" id="formProgressBar" style="width:0%"></div>
                             </div>
-                            <div class="text-end">
-                                <div class="fee-badge text-white text-center">
-                                    {{ pre_selected_course.display_fees }}
-                                </div>
-                                <div class="mt-2">
-                                    {% if pre_selected_course.is_available_for_registration %}
-                                    <span class="status-badge status-open">
-                                        <i class="fas fa-check-circle me-1"></i> Open for Registration
-                                    </span>
-                                    {% else %}
-                                    <span class="status-badge status-closed">
-                                        <i class="fas fa-times-circle me-1"></i> Registration Closed
-                                    </span>
-                                    {% endif %}
-                                </div>
+
+                            <div class="progress-text">
+                                <span id="progressText">0%</span> Completed
                             </div>
                         </div>
+
                     </div>
-                    <div class="course-hero-body">
-                        <div class="info-grid">
-                            <div class="info-item">
-                                <div class="info-icon">
-                                    <i class="fas fa-clock"></i>
+                </div>
+
+                <div class="form-body">
+
+                    <form method="post" id="registrationForm" novalidate>
+
+                        {% csrf_token %}
+
+                        <!-- PERSONAL -->
+                        <div class="form-section">
+
+                            <div class="section-heading">
+                                <div class="section-icon">
+                                    <i class="fas fa-user-graduate"></i>
                                 </div>
+
                                 <div>
-                                    <div class="small text-muted">Duration</div>
-                                    <div class="fw-semibold">{{ pre_selected_course.course_duration|default:"Flexible" }}</div>
+                                    <h5>Personal Information</h5>
+                                    <span>Basic applicant details</span>
                                 </div>
                             </div>
-                            <div class="info-item">
-                                <div class="info-icon">
-                                    <i class="fas fa-calendar-alt"></i>
+
+                            <div class="row g-4">
+
+                                <div class="col-md-6">
+                                    <label class="form-label">
+                                        Full Name
+                                        <span class="required">*</span>
+                                    </label>
+
+                                    {{ form.name }}
+
+                                    {% if form.name.errors %}
+                                        {{ form.name.errors }}
+                                    {% endif %}
                                 </div>
-                                <div>
-                                    <div class="small text-muted">Schedule</div>
-                                    <div class="fw-semibold">
-                                        {% if pre_selected_course.course_type == 'workshop' %}
-                                            {{ pre_selected_course.event_date|date:"d M Y"|default:"TBA" }}
-                                        {% else %}
-                                            {{ pre_selected_course.start_date|date:"d M Y"|default:"TBA" }}
-                                        {% endif %}
-                                    </div>
+
+                                <div class="col-md-6">
+                                    <label class="form-label">
+                                        Father's Name
+                                        <span class="required">*</span>
+                                    </label>
+
+                                    {{ form.father_name }}
+
+                                    {% if form.father_name.errors %}
+                                        {{ form.father_name.errors }}
+                                    {% endif %}
                                 </div>
-                            </div>
-                           
-                            <div class="info-item">
-                                <div class="info-icon">
-                                    <i class="fas fa-map-marker-alt"></i>
+
+                                <div class="col-md-6">
+                                    <label class="form-label">
+                                        Date of Birth
+                                        <span class="required">*</span>
+                                    </label>
+
+                                    {{ form.date_of_birth }}
+
+                                    {% if form.date_of_birth.errors %}
+                                        {{ form.date_of_birth.errors }}
+                                    {% endif %}
                                 </div>
-                                <div>
-                                    <div class="small text-muted">Mode</div>
-                                    <div class="fw-semibold">{{ pre_selected_course.get_mode_display }}</div>
+
+                                <div class="col-md-6">
+                                    <label class="form-label">
+                                        Category (General/OBC/SC/ST)
+                                        <span class="required">*</span>
+                                    </label>
+
+                                    {{ form.category }}
                                 </div>
+
                             </div>
                         </div>
+
+                        <!-- CONTACT -->
+                        <div class="form-section">
+
+                            <div class="section-heading">
+                                <div class="section-icon">
+                                    <i class="fas fa-phone-alt"></i>
+                                </div>
+
+                                <div>
+                                    <h5>Contact Information</h5>
+                                    <span>Email and mobile details</span>
+                                </div>
+                            </div>
+
+                            <div class="row g-4">
+
+                                <div class="col-md-6">
+                                    <label class="form-label">
+                                        Email Address
+                                        <span class="required">*</span>
+                                    </label>
+
+                                    {{ form.email_id }}
+
+                                    <div class="field-hint">
+                                        One email allowed per registration
+                                    </div>
+
+                                    {% if form.email_id.errors %}
+                                        {{ form.email_id.errors }}
+                                    {% endif %}
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label class="form-label">
+                                        Mobile Number
+                                        <span class="required">*</span>
+                                    </label>
+
+                                    {{ form.mobile_number }}
+
+                                    <div class="field-hint">
+                                        Enter valid 10-digit mobile number
+                                    </div>
+
+                                    {% if form.mobile_number.errors %}
+                                        {{ form.mobile_number.errors }}
+                                    {% endif %}
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                        <!-- COURSE -->
+                        <div class="form-section">
+
+                            <div class="section-heading">
+                                <div class="section-icon">
+                                    <i class="fas fa-book-open"></i>
+                                </div>
+
+                                <div>
+                                    <h5>Course Selection</h5>
+                                    <span>Select your preferred programme</span>
+                                </div>
+                            </div>
+
+                            <div class="row g-4">
+
+                                <div class="col-md-6">
+
+                                    <label class="form-label">
+                                        Select Course
+                                        <span class="required">*</span>
+                                    </label>
+
+                                    {% if course_readonly %}
+                                        <div class="form-control d-flex align-items-center bg-light fw-semibold">
+                                            {{ pre_selected_course.course_name }}
+                                        </div>
+
+                                        <input type="hidden"
+                                            name="course_enrolled"
+                                            value="{{ pre_selected_course.id }}"
+                                            id="id_course_enrolled_hidden">
+
+                                    {% else %}
+                                        {{ form.course_enrolled }}
+                                    {% endif %}
+
+                                </div>
+
+                                <div class="col-md-6" id="centreSection">
+
+                                    <label class="form-label">
+                                        Preferred Centre
+                                        <span class="required">*</span>
+                                    </label>
+
+                                    {{ form.preferred_centre }}
+
+                                    <div class="field-hint">
+                                        Select your preferred training centre
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                        <!-- BUTTONS -->
+                        <div class="d-flex flex-wrap gap-3 justify-content-end pt-2">
+
+                            <a href="{% url 'public:courses' %}" class="btn btn-back">
+                                <i class="fas fa-arrow-left me-2"></i>
+                                Browse Courses
+                            </a>
+
+                            <button type="submit" class="btn btn-register" id="submitBtn">
+                                <i class="fas fa-paper-plane me-2"></i>
+                                Submit Registration
+                            </button>
+
+                        </div>
+
+                    </form>
+
+                </div>
+            </div>
+
+            <!-- RIGHT SIDEBAR -->
+            <div class="course-sidebar">
+
+                {% if pre_selected_course %}
+                <div class="sidebar-card">
+
+                    <div class="course-banner">
+
+                        <div class="course-badge">
+                            <i class="fas fa-award"></i>
+                            Government Certified Programme
+                        </div>
+
+                        <div class="course-name">
+                            {{ pre_selected_course.course_name }}
+                        </div>
+
+                        <div class="course-fee">
+                            {{ pre_selected_course.display_fees }}
+                            <small>/ Course Fee</small>
+                        </div>
+
+                    </div>
+
+                    <div class="course-content">
+
+                        <div class="info-box">
+                            <div class="info-box-icon">
+                                <i class="fas fa-laptop"></i>
+                            </div>
+
+                            <div>
+                                <small>Course Mode</small>
+                                <strong>{{ pre_selected_course.get_mode_display }}</strong>
+                            </div>
+                        </div>
+
+                        <div class="info-box">
+                            <div class="info-box-icon">
+                                <i class="fas fa-clock"></i>
+                            </div>
+
+                            <div>
+                                <small>Duration</small>
+                                <strong>{{ pre_selected_course.course_duration|default:"Flexible Duration" }}</strong>
+                            </div>
+                        </div>
+
+                        <div class="info-box">
+                            <div class="info-box-icon">
+                                <i class="fas fa-calendar-alt"></i>
+                            </div>
+
+                            <div>
+                                <small>Starting Date</small>
+                                <strong>
+                                    {{ pre_selected_course.start_date|date:"d M Y"|default:"To Be Announced" }}
+                                </strong>
+                            </div>
+                        </div>
+
+                        <div class="info-box">
+                            <div class="info-box-icon">
+                                <i class="fas fa-user-check"></i>
+                            </div>
+
+                            <div>
+                                <small>Registration Status</small>
+                                <strong>
+                                    {% if pre_selected_course.is_available_for_registration %}
+                                        Open for Registration
+                                    {% else %}
+                                        Registration Closed
+                                    {% endif %}
+                                </strong>
+                            </div>
+                        </div>
+
                     </div>
                 </div>
                 {% endif %}
 
-                <!-- Registration Form Card -->
-                <div class="form-card">
-                    <div class="form-header">
-                        <h4 class="mb-0 fw-bold text-primary">
-                            <i class="fas fa-edit me-2"></i>Registration Form
-                        </h4>
-                        <p class="text-muted mb-0 mt-1 small">Please fill in your details accurately</p>
-                    </div>
-                    <div class="form-body">
-                        <form method="post" novalidate id="registrationForm">
-                            {% csrf_token %}
-                            
-                            {% if form.non_field_errors %}
-                            <div class="alert alert-danger alert-custom mb-4">
-                                {% for error in form.non_field_errors %}
-                                    <i class="fas fa-exclamation-circle me-2"></i>{{ error }}
-                                {% endfor %}
-                            </div>
-                            {% endif %}
+                <!-- GOVT CARD -->
+                <div class="sidebar-card govt-card">
 
-                            <!-- Personal Information -->
-                            <div class="form-section">
-                                <div class="section-title">
-                                    <i class="fas fa-user-graduate"></i>
-                                    <span>Personal Information</span>
-                                </div>
-                                <div class="row g-3">
-                                    <div class="col-md-6">
-                                        <label class="form-label">Full Name <span class="required-star">*</span></label>
-                                        {{ form.name }}
-                                        {% if form.name.errors %}
-                                            <div class="text-danger small mt-1">{{ form.name.errors }}</div>
-                                        {% endif %}
-                                    </div>
-                                    <div class="col-md-6">
-                                        <label class="form-label">Father's Name <span class="required-star">*</span></label>
-                                        {{ form.father_name }}
-                                        {% if form.father_name.errors %}
-                                            <div class="text-danger small mt-1">{{ form.father_name.errors }}</div>
-                                        {% endif %}
-                                    </div>
-                                    <div class="col-md-6">
-                                        <label class="form-label">Date of Birth <span class="required-star">*</span></label>
-                                        {{ form.date_of_birth }}
-                                        {% if form.date_of_birth.errors %}
-                                            <div class="text-danger small mt-1">{{ form.date_of_birth.errors }}</div>
-                                        {% endif %}
-                                    </div>
-                                    <div class="col-md-6">
-                                        <label class="form-label">Category <span class="required-star">*</span></label>
-                                        {{ form.category }}
-                                    </div>
-                                </div>
-                            </div>
+                    <h6>
+                        <i class="fas fa-building-columns me-2 text-primary"></i>
+                        Important Information
+                    </h6>
 
-                            <!-- Contact Information -->
-                            <div class="form-section">
-                                <div class="section-title">
-                                    <i class="fas fa-phone-alt"></i>
-                                    <span>Contact Information</span>
-                                </div>
-                                <div class="row g-3">
-                                    <div class="col-md-6">
-                                        <label class="form-label">Email Address <span class="required-star">*</span></label>
-                                        {{ form.email_id }}
-                                        {% if form.email_id.errors %}
-                                            <div class="text-danger small mt-1">{{ form.email_id.errors }}</div>
-                                        {% endif %}
-                                        <small class="text-muted">One email per course registration</small>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <label class="form-label">Mobile Number <span class="required-star">*</span></label>
-                                        {{ form.mobile_number }}
-                                        {% if form.mobile_number.errors %}
-                                            <div class="text-danger small mt-1">{{ form.mobile_number.errors }}</div>
-                                        {% endif %}
-                                        <small class="text-muted">10-digit number</small>
-                                    </div>
-                                </div>
-                            </div>
+                    <ul class="govt-list">
 
-                            <!-- Course Selection -->
-                            <div class="form-section">
-                                <div class="section-title">
-                                    <i class="fas fa-graduation-cap"></i>
-                                    <span>Course Selection</span>
-                                </div>
-                                <div class="row g-3">
-                                    <div class="col-md-6">
-                                        <label class="form-label">Select Course <span class="required-star">*</span></label>
-                                        {% if course_readonly %}
-                                            <div class="bg-light p-3 rounded-3 fw-semibold">
-                                                {{ pre_selected_course.course_name }}
-                                                <input type="hidden" name="course_enrolled" value="{{ pre_selected_course.id }}" id="id_course_enrolled_hidden">
-                                            </div>
-                                        {% else %}
-                                            {{ form.course_enrolled }}
-                                        {% endif %}
-                                        {% if form.course_enrolled.errors %}
-                                            <div class="text-danger small mt-1">{{ form.course_enrolled.errors }}</div>
-                                        {% endif %}
-                                    </div>
-                                    
-                                    <!-- Centre Selection - Will be hidden for online courses -->
-                                    <div class="col-md-6" id="centreSection">
-                                        <label class="form-label" id="centreLabel">Preferred Centre <span id="centreRequired" class="required-star">*</span></label>
-                                        <div id="centreSelectContainer">
-                                            {{ form.preferred_centre }}
-                                        </div>
-                                        <small class="text-muted" id="centreHelpText">Select your preferred training centre</small>
-                                        {% if form.preferred_centre.errors %}
-                                            <div class="text-danger small mt-1">{{ form.preferred_centre.errors }}</div>
-                                        {% endif %}
-                                    </div>
-                                </div>
-                            </div>
+                        <li>
+                            <i class="fas fa-check-circle"></i>
+                            <span>Ensure all submitted information is accurate and valid.</span>
+                        </li>
 
-                            <!-- Submit Buttons -->
-                            <div class="d-flex flex-wrap gap-3 justify-content-end mt-4 pt-3">
-                                <a href="{% url 'public:courses' %}" class="btn btn-outline-custom">
-                                    <i class="fas fa-arrow-left me-2"></i>Browse Courses
-                                </a>
-                                <button type="submit" class="btn btn-submit text-white" id="submitBtn">
-                                    <i class="fas fa-paper-plane me-2"></i>Submit Registration
-                                </button>
-                            </div>
-                        </form>
-                    </div>
+                        <li>
+                            <i class="fas fa-check-circle"></i>
+                            <span>NIELIT courses are recognized under MeitY, Government of India.</span>
+                        </li>
+
+                        <li>
+                            <i class="fas fa-check-circle"></i>
+                            <span>Applicants may receive course updates through email and SMS.</span>
+                        </li>
+
+                        <li>
+                            <i class="fas fa-check-circle"></i>
+                            <span>Admission confirmation depends on eligibility verification.</span>
+                        </li>
+
+                    </ul>
+
                 </div>
+
             </div>
+
         </div>
+
     </div>
 </div>
 
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const courseSelect = document.getElementById('id_course_enrolled');
-        const centreSection = document.getElementById('centreSection');
-        const centreSelect = document.getElementById('id_preferred_centre');
-        const centreRequired = document.getElementById('centreRequired');
-        const centreHelpText = document.getElementById('centreHelpText');
-        const centreLabel = document.getElementById('centreLabel');
-        const hiddenCourseInput = document.getElementById('id_course_enrolled_hidden');
-        
-        function getCourseId() {
-            if (hiddenCourseInput) {
-                return hiddenCourseInput.value;
+// Get CSRF token from cookie
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
             }
-            if (courseSelect) {
-                return courseSelect.value;
+        }
+    }
+    return cookieValue;
+}
+
+document.addEventListener('DOMContentLoaded', function () {
+
+    const csrftoken = getCookie('csrftoken');
+
+    /* =========================
+        FORM PROGRESS
+    ========================== */
+
+    const form = document.getElementById('registrationForm');
+    const progressBar = document.getElementById('formProgressBar');
+    const progressText = document.getElementById('progressText');
+    const submitBtn = document.getElementById('submitBtn');
+
+    const fields = form.querySelectorAll('input, select, textarea');
+
+    function updateProgress() {
+
+        let filled = 0;
+        let total = 0;
+
+        fields.forEach(field => {
+
+            if(field.type !== 'hidden' && !field.disabled && field.id !== 'id_course_enrolled_hidden'){
+
+                total++;
+
+                if(field.value && field.value.trim() !== ''){
+                    filled++;
+                }
             }
-            return null;
-        }
-        
-        function updateCentreSection() {
-            const courseId = getCourseId();
-            
-            if (!courseId) {
-                // No course selected - show centre section but disabled
-                centreSection.style.display = 'block';
-                centreSelect.innerHTML = '<option value="">Please select a course first</option>';
-                centreSelect.disabled = true;
-                centreRequired.style.display = 'inline';
-                centreHelpText.innerHTML = 'Please select a course first';
-                return;
-            }
-            
-            // Fetch course details to check mode
-            fetch(`/course/api/get-course-centres/?course_id=${courseId}`)
-                .then(response => response.json())
-                .then(data => {
-                    if (data.mode === 'online') {
-                        // COMPLETELY HIDE centre section for online courses
-                        centreSection.style.display = 'none';
-                        centreSelect.disabled = true;
-                        centreSelect.required = false;
-                    } else {
-                        // SHOW centre section for offline/hybrid courses
-                        centreSection.style.display = 'block';
-                        centreSelect.disabled = false;
-                        centreSelect.required = true;
-                        centreRequired.style.display = 'inline';
-                        
-                        // Populate centres
-                        centreSelect.innerHTML = '<option value="">--------</option>';
-                        
-                        if (data.centres && data.centres.length > 0) {
-                            data.centres.forEach(centre => {
-                                const option = document.createElement('option');
-                                option.value = centre.id;
-                                option.textContent = centre.centre_name || centre.name;
-                                centreSelect.appendChild(option);
-                            });
-                            centreHelpText.innerHTML = '<i class="fas fa-info-circle me-1"></i> Select your preferred training centre';
-                        } else {
-                            centreSelect.innerHTML = '<option value="">No centres available</option>';
-                            centreSelect.disabled = true;
-                            centreHelpText.innerHTML = '<i class="fas fa-exclamation-triangle me-1"></i> No centres available for this course';
-                        }
-                    }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    centreSection.style.display = 'block';
-                    centreSelect.innerHTML = '<option value="">Error loading centres</option>';
-                    centreSelect.disabled = true;
-                });
-        }
-        
-        // Initial load
-        if (courseSelect) {
-            courseSelect.addEventListener('change', updateCentreSection);
-        }
-        
-        // Call on page load if course is pre-selected
-        updateCentreSection();
+        });
+
+        let percent = Math.round((filled / total) * 100);
+
+        progressBar.style.width = percent + '%';
+        progressText.innerText = percent + '%';
+    }
+
+    fields.forEach(field => {
+        field.addEventListener('input', updateProgress);
+        field.addEventListener('change', updateProgress);
     });
+
+    updateProgress();
+
+    /* =========================
+        COURSE CENTRE LOGIC with CSRF
+    ========================== */
+
+    const courseSelect = document.getElementById('id_course_enrolled');
+    const centreSection = document.getElementById('centreSection');
+    const centreSelect = document.getElementById('id_preferred_centre');
+    const hiddenCourseInput = document.getElementById('id_course_enrolled_hidden');
+
+    function getCourseId() {
+
+        if(hiddenCourseInput){
+            return hiddenCourseInput.value;
+        }
+
+        if(courseSelect){
+            return courseSelect.value;
+        }
+
+        return null;
+    }
+
+    function updateCentreSection(){
+
+        const courseId = getCourseId();
+
+        if(!courseId){
+            return;
+        }
+
+        fetch(`/course/api/get-course-centres/?course_id=${courseId}`, {
+            method: 'GET',
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+
+            if(data.mode === 'online'){
+
+                centreSection.style.display = 'none';
+                centreSelect.required = false;
+                centreSelect.disabled = true;
+                centreSelect.value = '';
+
+            } else {
+
+                centreSection.style.display = 'block';
+                centreSelect.required = true;
+                centreSelect.disabled = false;
+
+                const currentValue = centreSelect.value;
+                centreSelect.innerHTML = '<option value="">-- Select Training Centre --</option>';
+
+                if(data.centres && data.centres.length > 0){
+
+                    data.centres.forEach(centre => {
+
+                        const option = document.createElement('option');
+                        option.value = centre.id;
+                        option.textContent = centre.centre_name || centre.name;
+                        centreSelect.appendChild(option);
+                    });
+                } else {
+                    centreSelect.innerHTML = '<option value="">No centres available</option>';
+                }
+
+                // Restore previous selection if still valid
+                if(currentValue && centreSelect.querySelector(`option[value="${currentValue}"]`)) {
+                    centreSelect.value = currentValue;
+                }
+            }
+        })
+        .catch(error => {
+            console.error('Error fetching centres:', error);
+        });
+    }
+
+    if(courseSelect){
+        courseSelect.addEventListener('change', updateCentreSection);
+    }
+
+    updateCentreSection();
+
+    /* =========================
+        FORM SUBMIT with Loading State
+    ========================== */
+    
+    form.addEventListener('submit', function(e) {
+        // Don't disable if form has errors - let Django handle it
+        if (submitBtn) {
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<span class="loading-spinner"></span> Submitting...';
+            
+            // Re-enable after 5 seconds in case of error
+            setTimeout(function() {
+                if (submitBtn.disabled) {
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = '<i class="fas fa-paper-plane me-2"></i>Submit Registration';
+                }
+            }, 5000);
+        }
+    });
+});
 </script>
+
 {% endblock %}
