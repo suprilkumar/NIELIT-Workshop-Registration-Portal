@@ -30,7 +30,7 @@ class Student(models.Model):
     email_id = models.EmailField()
     father_name = models.CharField(max_length=200)
     course_enrolled = models.ForeignKey(Course, on_delete=models.CASCADE, related_name='students')
-    preferred_centre = models.ForeignKey(Centre, on_delete=models.CASCADE, related_name='students')
+    preferred_centre = models.ForeignKey(Centre, on_delete=models.SET_NULL, null=True, blank=True, related_name='students')  # CHANGED: Allow NULL
     is_approved = models.BooleanField(default=False)
 
     registration_date = models.DateTimeField(auto_now_add=True)

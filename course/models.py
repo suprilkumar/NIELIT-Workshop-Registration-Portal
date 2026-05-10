@@ -46,6 +46,7 @@ class Course(models.Model):
     COURSE_TYPE_CHOICES = [
         ('regular', 'Regular Course (Multiple Days/Weeks)'),
         ('workshop', 'Single Day Workshop/Event'),
+        ('Online Bootcamp', 'Online Bootcamp'),
         ('seminar', 'Seminar'),
         ('webinar', 'Webinar'),
     ]
